@@ -65,6 +65,8 @@ def detailsWindow(passw) -> None:
 
         OutputLbl = Label(root, text='Output', font=('Bahnscrift', 12), width=66, pady=20, bg='white', highlightbackground="black", highlightthickness=1)
         OutputLbl.place(x=40, y=350)
+      
+        # A dictionary containing all color, border font stuff of buttons
         buttonLooks = {
              'relief':FLAT, 'padx':20, 'font':('Century Gothic', 15),
              'bg':'#808080', 'fg':'white', 'activebackground':'#808083', 'activeforeground':'white'
