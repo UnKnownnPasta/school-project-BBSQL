@@ -75,7 +75,7 @@ def detailsWindow(passw) -> None:
             
             OutputLbl['text'] = 'Created both tables.'
 
-        def Query():
+
 
     else:
         return 'error'
@@ -88,6 +88,7 @@ def main(): # Login Screen
     root.resizable(False, False)
     
     signinLabel = Label(root, text='LOG IN', font=('Bahnschrift', 20, 'bold'))
+
     signinLabel.place(y=10, relx=0.4)
 
     unLbl = Label(root, text='Username', font=('Cascadia Code', 10, 'italic'))
