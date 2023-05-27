@@ -4,10 +4,9 @@ import mysql.connector as msor
 
 root = Tk()
 
-def unpwCheck(un, pw):
+def unpwCheck(un, pw): # username, password
     # To access current login screen widgets
     widgets = [signinLabel, unLbl, pwLbl, unField, pwField, loginBtn]
-    status = None
 
     # Check Login Details
     if (un=='' or pw=='') or (un != 'a' or pw !='1'):
@@ -18,44 +17,70 @@ def unpwCheck(un, pw):
     
         status = detailsWindow(pw) # Here we call the main interface. If any error occurs during startup, the following if statements will handle it
 
-        if status == 'fail-initial': # If SQL itself had a error in doing .connect()
-            messagebox.showerror('SQL Error', 'Could not initialize SQL Connection, login again.')
-            main() # Return to login screen
-        if status == 'fail-connect': # If there is a mistake in login details
-            messagebox.showerror('SQL Error', 'Could not connect to database, login again.')
+        if status == 'error': # If there is error logging in to SQL
+            messagebox.showerror('SQL Error - No Database connection', str(status[1]))
             main() # Return to login screen
 
-def detailsWindow(passw):
-    try:
-        sqlMain = msor.connect(host='localhost', user='root', password='root', database='school')
-    except msor.Error:
-        return 'fail-initial' 
+def detailsWindow(passw) -> None:
+    con = msor.connect(host='localhost', user='root', password='root')
 
-    if sqlMain.is_connected() == False:
-        return 'fail-connect'
+    if con.is_connected():
+        root.geometry('700x500') # Resize window
+        cur = con.cursor()
+        cur.execute('use school')
+        con.commit()
+
+        text_1 = Label(root, text='| INITIALIZE', font=('Franklin Gothic', 20))
+        text_1.place(x=40, y=15)
+
+        OutputLbl = Label(root, text='Output', font=('Bahnscrift', 12), width=66, pady=20, bg='white', highlightbackground="black", highlightthickness=1)
+        OutputLbl.place(x=40, y=350)
+
+        intializeButton = Button(root, command= lambda: checkTable(), text='Check Tables', relief=FLAT, padx=20, font=('Century Gothic', 15), bg='#808080', fg='white', activebackground='#808083', activeforeground='white')
+        intializeButton.place(x=40, y=65)
+
+        createButton = Button(root, command= lambda: createTable(), text='Create Tables', relief=FLAT, padx=20, font=('Century Gothic', 15), bg='#808080', fg='white', activebackground='#808083', activeforeground='white')
+        createButton.place(x=240, y=65)
+
+        text_2 = Label(root, text='| COMMANDS', font=('Franklin Gothic', 20))
+        text_2.place(x=40, y=120)
+
+        QueryButton = Button(root, command= lambda: Query(), text='Run A Query', relief=FLAT, padx=20, font=('Century Gothic', 15), bg='#808080', fg='white', activebackground='#808083', activeforeground='white')
+        QueryButton.place(x=40, y=170)
+
+        # Function to check if the tables Donor and Reciever already exist
+        def checkTable():
+            checkQuery = "SHOW TABLES FROM school LIKE %s"
+            exists = [[False, 'Donor'], [False, 'Reciever']] # Storing the result here
+            cursor = con.cursor()
+
+            OutputLbl['text'] = ''
+
+            for i in exists:
+                cursor.execute(checkQuery, (i[1],))
+                row = cursor.fetchone()
+                if row:
+                    OutputLbl['text'] += f'   {i[1]} table was found     '
+                else:
+                    OutputLbl['text'] += f'   {i[1]} table was not found     '
         
-    root.geometry('700x500') # Resize window
-    cur = sqlMain.cursor()
+        # Function to create Donor and Reciever tabke
+        def createTable():
+            cursor = con.cursor()
+            createQuery_1 = "create table Donor (DonorID int(3) primary key not null unique, DonorName char(20), DonorAge int(2), DonorAddress char(40), BloodType char(3))"
+            createQuery_2 = "create table Reciever (RecieverID int(3) primary key not null unique, DonorID int, foreign key (DonorID) references Donor(DonorID), RecieverName char(20), RecieverAddress char(40), RecieverAge int(2), BloodGroup char(3), Date date)"
 
-    intializeButton = Button()
-    # Function to check if the tables Donor and Reciever already exist
-    def checkTable():
-        checkQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%s') AS table_exists;"
-        exists = [[False, 'Donor'], [False, 'Reciever']] # Storing the result here
+            cursor.execute(createQuery_1)
+            cursor.execute(createQuery_2)
+            
+            OutputLbl['text'] = 'Created both tables.'
 
-        cur.execute(checkQuery, ('Donor',))
-        exists[0][0] = bool(cur.fetchone()[0])
-        cur.execute(checkQuery, ('Reciever',))
-        exists[1][0] = bool(cur.fetchone()[0])
+        def Query():
 
-        return exists
-
-
-    headingLabel = Label(root, text='')
+    else:
+        return 'error'
     
-        
-    
-def main():
+def main(): # Login Screen
     global root, signinLabel, unLbl, pwLbl, unField, pwField, loginBtn
     root.title('Blood bank mng')
     root.iconphoto(False, PhotoImage(file='./plus.png'))
@@ -63,28 +88,22 @@ def main():
     root.resizable(False, False)
     
     signinLabel = Label(root, text='LOG IN', font=('Bahnschrift', 20, 'bold'))
-    signinLabel.pack()
     signinLabel.place(y=10, relx=0.4)
 
     unLbl = Label(root, text='Username', font=('Cascadia Code', 10, 'italic'))
-    unLbl.pack()
     unLbl.place(x=50, y=100)
 
     pwLbl = Label(root, text='Password', font=('Cascadia Code', 10, 'italic'))
-    pwLbl.pack()
     pwLbl.place(x=50, y=140)
 
     unField = Entry(root)
-    unField.pack()
     unField.place(x = 150, y=100)
 
     pwField = Entry(root, show='*')
-    pwField.pack()
     pwField.place(x = 150, y=140)
 
     loginBtn = Button(root, text='Submit', relief=RIDGE, padx=40, command= lambda: unpwCheck(unField.get(), pwField.get()))
-    loginBtn.pack()
-    loginBtn.place(x=140, y=200)
+    loginBtn.place(x=150, y=200)
 
 if __name__ == '__main__':
     main()
