@@ -150,20 +150,25 @@ def detailsWindow(passw) -> None:
                 else:
                     values = eval(values)
 
-                cur.execute(query, values)
+                try:
+                    cur.execute(query, values)
+                except:
+                    OutputLbl['text'] += 'Error\n'
+
                 res = cur.fetchall()
-                t = '{:<3}{:<20}{:<2}{:<20}{:<3}'
-                v = '{:<3}{:<3}{:<20}{:<2}{:<20}{:<3}{:<8}'
+                t = '{:<7}{:<20}{:<7}{:<20}{:<10}'
+                v = '{:<7}{:<7}{:<20}{:<5}{:<20}{:<7}{:<12}'
                 if tbl == 'Donor':
                     OutputLbl['text'] = t.format('ID', 'Name', 'Age', 'Address', 'BloodType')
                 else:
                     OutputLbl['text'] = v.format('D_ID', 'ID', 'Name', 'Age', 'Address', 'BloodType', 'Date')
                 for row in res:
+                    for x in row:
+                        x = str(x).strip()
                     if tbl == 'Donor':
                         OutputLbl['text'] += '\n' + t.format(row[0], row[1], row[2], row[3], row[4])
                     elif tbl == 'Receiver':
                         OutputLbl['text'] += '\n' + t.format(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
-
 
     else:
         return 'error'
