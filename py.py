@@ -145,19 +145,12 @@ def detailsWindow(passw) -> None:
                 cursor = con.cursor()
                 query = field_1.get()
                 values = field_2.get()
-                if values.strip() == '':
-                    values = ()
-                else:
-                    values = eval(values)
 
-                try:
-                    cur.execute(query, values)
-                except:
-                    OutputLbl['text'] += 'Error\n'
+                cur.execute(query, values)
 
                 res = cur.fetchall()
-                t = '{:<7}{:<20}{:<7}{:<20}{:<10}'
-                v = '{:<7}{:<7}{:<20}{:<5}{:<20}{:<7}{:<12}'
+                t = '{:<10}{:<20}{:<10}{:<20}{:<10}'
+                v = '{:<10}{:<10}{:<20}{:<10}{:<20}{:<10}{:<15}'
                 if tbl == 'Donor':
                     OutputLbl['text'] = t.format('ID', 'Name', 'Age', 'Address', 'BloodType')
                 else:
