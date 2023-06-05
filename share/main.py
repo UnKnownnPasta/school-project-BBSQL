@@ -3,6 +3,8 @@ from tkinter import messagebox
 import mysql.connector as sql
 
 root = Tk()
+img = PhotoImage(file='plus.png')
+db = 'school'
 
 def create_label(tw, text, x, y, font):
     label = Label(tw, text=text, font=font)
@@ -26,7 +28,7 @@ def create_button(tw, cmd, text, x, y):
 def main(): # Login Screen
     global root, signinLabel, usernameLbl, passwLbl, unField, pwField, loginBtn
     root.title('Blood Bank Management')
-    root.iconphoto(False, PhotoImage(file='./plus.png'))
+    root.iconphoto(False, img)
     root.geometry('400x300')
     root.resizable(False, False)
     
@@ -71,13 +73,13 @@ def detailsWindow(passw) -> None:
     if con.is_connected():
         root.geometry('700x500') # Resize window
         cur = con.cursor()
-        cur.execute('use school')
+        cur.execute('use %s'%(db,))
         con.commit()
 
         text_1 = create_label(root, '| INITIALIZE', 40, 15, ('Franklin Gothic', 20))
 
         OutputLbl = create_label(root, 'Output', 40, 330, ('Lucida Console', 8))
-        OutputLbl.config(width=90, justify=LEFT, height=12, bg='white', highlightbackground="black", highlightthickness=1)
+        OutputLbl.config(width=90, justify=LEFT, height=12, bg='white', highlightbackground="black", highlightthickness=1, padx=10)
       
         # A dictionary containing all color, border font stuff of buttons
         buttonLooks = {
@@ -105,19 +107,19 @@ def detailsWindow(passw) -> None:
         # Function to check if the tables Donor and Receiver already exist
         def checkTable():
             clearOpt()
-            checkQuery = "SHOW TABLES FROM school LIKE %s"
+            checkQuery = f"SHOW TABLES FROM {db} LIKE %s;"
             tables = [[False, 'Donor'], [False, 'Receiver']] # Storing the result here
             cur = con.cursor()
 
             for i in tables: # check both tables
-                cur.execute(checkQuery, (i[1],)) # [1] gives the table name
+                cur.execute(checkQuery, (i[1],)) # Execute the query with the table name as a parameter
                 row = cur.fetchone() # return None if table doesn't exist, which evaluates to False
-                if row: # 
-                    OutputLbl['text'] += f'   {i[1]} table was found     '
-                else:
+                if row == None:
                     OutputLbl['text'] += f'   {i[1]} table was not found     '
+                else:
+                    OutputLbl['text'] += f'   {i[1]} table was found     '
 
-        # Function to create Donor and Receiver tabke
+        # Function to create Donor and Receiver table
         def createTable():
             createQuery_1 = "create table if not exists Donor (DonorID int(3) primary key not null unique, DonorName char(20), DonorAge int(2), DonorAddress char(20), BloodType char(3))"
             createQuery_2 = "create table if not exists Receiver (ReceiverID int(3) primary key not null unique, DonorID int, foreign key (DonorID) references Donor(DonorID), ReceiverName char(20), ReceiverAge int(2), ReceiverAddress char(20), BloodGroup char(3), Date date)"
@@ -131,7 +133,7 @@ def detailsWindow(passw) -> None:
             win_1 = Toplevel(root)
             win_1.geometry('500x300')
             win_1.title('')
-            win_1.iconphoto(False, PhotoImage(file='plus.png'))
+            win_1.iconphoto(False, img)
             win_1.resizable(False, False)
 
             heading = create_label(win_1, '| QUERY', 40, 15, ('Franklin Gothic', 20))
@@ -166,7 +168,7 @@ def detailsWindow(passw) -> None:
 
                 rows = cur.fetchall()
                 t = '{:<10}{:<20}{:<10}{:<20}{:<10}'
-                v = '{:<7}{:<12}{:<17}{:<12}{:<17}{:<12}{:<12}'
+                v = '{:<10}{:<12}{:<15}{:<12}{:<20}{:<10}{:<10}'
 
                 if selectEntry_2.get() == 'Donor':
                     header = t.format('DonorID', 'DonorName', 'DonorAge', 'DonorAddress', 'BloodType')                        
@@ -179,7 +181,7 @@ def detailsWindow(passw) -> None:
                     if selectEntry_2.get() == 'Donor':
                         line = t.format(*row)
                     else:
-                        line = v.format(*row)
+                        line = v.format(*[str(i) for i in row])
                     output.append(line)
 
                 OutputLbl['text'] = '\n'.join(output)
@@ -188,7 +190,7 @@ def detailsWindow(passw) -> None:
             win_2 = Toplevel(root)
             win_2.geometry('500x300')
             win_2.title('')
-            win_2.iconphoto(False, PhotoImage(file='plus.png'))
+            win_2.iconphoto(False, img)
             win_2.resizable(False, False)
 
             heading = create_label(win_2, '| INSERT', 40, 15, ('Franklin Gothic', 20))
@@ -214,7 +216,7 @@ def detailsWindow(passw) -> None:
             win_3 = Toplevel(root)
             win_3.geometry('500x300')
             win_3.title('')
-            win_3.iconphoto(False, PhotoImage(file='plus.png'))
+            win_3.iconphoto(False, img)
             win_3.resizable(False, False)
 
             heading = create_label(win_3, '| DELETE', 40, 15, ('Franklin Gothic', 20))
@@ -240,7 +242,7 @@ def detailsWindow(passw) -> None:
             win_4 = Toplevel(root)
             win_4.geometry('500x300')
             win_4.title('')
-            win_4.iconphoto(False, PhotoImage(file='plus.png'))
+            win_4.iconphoto(False, img)
             win_4.resizable(False, False)
 
             heading = create_label(win_4, '| UPDATE', 40, 15, ('Franklin Gothic', 20))
@@ -281,10 +283,9 @@ def detailsWindow(passw) -> None:
                         statement += f"{i[0]} = '{i[1]}'"
                     statement += f", {i[0]} = '{i[1]}'"
 
-                statement += " WHERE %s = %s"%(setField_4.get(), setValue_4.get())
+                statement += " WHERE %s = '%s'"%(setField_4.get(), setValue_4.get())
 
                 try:
-                    print(statement)
                     cur.execute(statement)
                     con.commit()
                     OutputLbl['text'] = 'Successfully updated record!'
