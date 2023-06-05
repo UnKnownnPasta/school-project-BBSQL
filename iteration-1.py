@@ -173,7 +173,7 @@ def detailsWindow(passw) -> None:
                     if selectEntry_2.get() == 'Donor':
                         line = t.format(*row)
                     else:
-                        line = v.format(*row)
+                        line = v.format(*[str(i) for i in row])
                     output.append(line)
 
                 OutputLbl['text'] = '\n'.join(output)
