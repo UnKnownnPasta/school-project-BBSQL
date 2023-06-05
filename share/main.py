@@ -76,8 +76,8 @@ def detailsWindow(passw) -> None:
 
         text_1 = create_label(root, '| INITIALIZE', 40, 15, ('Franklin Gothic', 20))
 
-        OutputLbl = create_label(root, 'Output', 40, 360, ('Courier New', 8))
-        OutputLbl.config(width=90, justify=LEFT, height=6, bg='white', highlightbackground="black", highlightthickness=1)
+        OutputLbl = create_label(root, 'Output', 40, 330, ('Lucida Console', 8))
+        OutputLbl.config(width=90, justify=LEFT, height=12, bg='white', highlightbackground="black", highlightthickness=1)
       
         # A dictionary containing all color, border font stuff of buttons
         buttonLooks = {
@@ -85,7 +85,7 @@ def detailsWindow(passw) -> None:
              'bg':'#808080', 'fg':'white', 'activebackground':'#808083', 'activeforeground':'white'
         }
 
-        clearOutput = create_button(root, lambda: clearOpt(), 'CLEAR', 40, 320)
+        clearOutput = create_button(root, lambda: clearOpt(), 'CLEAR', 40, 290)
         intializeButton = create_button(root, lambda: checkTable(), 'Check Tables', 40, 65)
         createButton = create_button(root, lambda: createTable(), 'Create Tables', 240, 65)
 
@@ -96,7 +96,9 @@ def detailsWindow(passw) -> None:
         InsertBtn = Button(root, command= lambda: Insert(), text='Insert Record',  **buttonLooks)
         InsertBtn.place(x=160, y=170)
         DeleteBtn = Button(root, command= lambda: Destroy(), text='Delete Record',  **buttonLooks)
-        DeleteBtn.place(x=350, y=170)
+        DeleteBtn.place(x=349, y=170)
+        UpdateBtn = Button(root, command= lambda: Update(), text='Update Record',  **buttonLooks)
+        UpdateBtn.place(x=40, y=215)
 
         def clearOpt(): OutputLbl['text'] = ''
 
@@ -156,16 +158,20 @@ def detailsWindow(passw) -> None:
                 if selectEntry_4.get() != '':
                     statement += ' ORDER BY %s'%(selectEntry_4.get(),)
 
-                cur.execute(statement)
+                try:
+                    cur.execute(statement)
+                except:
+                    OutputLbl['text'] = 'Failed to run Query.'
+                    return
 
                 rows = cur.fetchall()
                 t = '{:<10}{:<20}{:<10}{:<20}{:<10}'
-                v = '{:<10}{:<10}{:<15}{:<10}{:<15}{:<10}{:<10}'
+                v = '{:<7}{:<12}{:<17}{:<12}{:<17}{:<12}{:<12}'
 
                 if selectEntry_2.get() == 'Donor':
                     header = t.format('DonorID', 'DonorName', 'DonorAge', 'DonorAddress', 'BloodType')                        
                 else:
-                    header = v.format('DonorID', 'RID', 'RName', 'RAge', 'RAddress', 'BloodType', 'Date')
+                    header = v.format('DonorID', 'ReceiverID', 'ReceiverName', 'ReceiverAge', 'ReceiverAddress', 'BloodType', 'Date')
 
                 output = [header]  # store the lines in a list
 
@@ -192,9 +198,7 @@ def detailsWindow(passw) -> None:
             selectEntry_1 = create_entry(win_2, 15, 180, 70)
             selectEntry_2 = create_entry(win_2, 40, 40, 145)
 
-            btn = Button(win_2, text='Submit', **buttonLooks, command= lambda: doInsert())
-            btn.place(x=100, y=240)
-
+            btn = create_button(win_2, lambda: doInsert(), 'Submit', 100, 240)
 
             def doInsert():
                 statement = "INSERT INTO %s VALUES %s"%(selectEntry_1.get(), selectEntry_2.get())
@@ -204,6 +208,7 @@ def detailsWindow(passw) -> None:
                     OutputLbl['text'] = 'Successfully inserted record into %s table!\nValues: %s'%(selectEntry_1.get(), selectEntry_2.get())
                 except:
                     OutputLbl['text'] = 'Failed to insert record.'
+                    return
 
         def Destroy():
             win_3 = Toplevel(root)
@@ -219,8 +224,7 @@ def detailsWindow(passw) -> None:
             selectEntry_1 = create_entry(win_3, 15, 190, 70)
             selectEntry_2 = create_entry(win_3, 40, 40, 145)
 
-            btn = Button(win_3, text='Submit', **buttonLooks, command=lambda: doDelete())
-            btn.place(x=100, y=240)
+            btn = create_button(win_3, lambda: doDelete(), 'Submit', 100, 240)
 
             def doDelete():
                 statement = "DELETE FROM %s WHERE %s" % (selectEntry_1.get(), selectEntry_2.get())
@@ -230,8 +234,63 @@ def detailsWindow(passw) -> None:
                     OutputLbl['text'] = f"Successfully removed record from {selectEntry_1.get()} table!"
                 except:
                     OutputLbl['text'] = 'Failed to delete record.'
+                    return
 
+        def Update():
+            win_4 = Toplevel(root)
+            win_4.geometry('500x300')
+            win_4.title('')
+            win_4.iconphoto(False, PhotoImage(file='plus.png'))
+            win_4.resizable(False, False)
 
+            heading = create_label(win_4, '| UPDATE', 40, 15, ('Franklin Gothic', 20))
+
+            global setField_2, setValue_2, setField_3, setValue_3, setField_3, setValue_3
+            Lbl_1 = create_label(win_4, 'UPDATE', 40, 67, ('Candara', 17))
+            selectEntry_1 = create_entry(win_4, 15, 130, 70)
+            Lbl_2 = create_label(win_4, 'SET                           =', 40, 107, ('Candara', 17))
+            setField_2 = create_entry(win_4, 10, 90, 107)
+            setValue_2 = create_entry(win_4, 10, 240, 107)
+
+            Lbl_3 = create_label(win_4, 'SET                           =', 40, 147, ('Candara', 17))
+            setField_3 = create_entry(win_4, 10, 90, 147)
+            setValue_3 = create_entry(win_4, 10, 240, 147)
+
+            Lbl_4 = create_label(win_4, 'WHERE                          =', 40, 187, ('Candara', 17))
+            setField_4 = create_entry(win_4, 10, 125, 187)
+            setValue_4 = create_entry(win_4, 10, 265, 187)
+
+            btn = create_button(win_4, lambda: doUpdate(), 'Submit', 100, 240)
+
+            def doUpdate():
+                setList = []
+
+                for i in range(1,3):
+                    a = eval('setField_' + str(i+1)).get()
+                    b = eval('setValue_' + str(i+1)).get()
+
+                    if a == '' and b == '' and i == 0:
+                        OutputLbl['text'] = 'No SET values mentioned.'
+                        return
+                    elif a != '' and b!= '':
+                        setList.append((a, b))
+                statement = "UPDATE %s SET "%(selectEntry_1.get(),)
+
+                for i in setList:
+                    if statement[-1] == ' ':
+                        statement += f"{i[0]} = '{i[1]}'"
+                    statement += f", {i[0]} = '{i[1]}'"
+
+                statement += " WHERE %s = %s"%(setField_4.get(), setValue_4.get())
+
+                try:
+                    print(statement)
+                    cur.execute(statement)
+                    con.commit()
+                    OutputLbl['text'] = 'Successfully updated record!'
+                except:
+                    OutputLbl['text'] = 'Failed to update record.'
+                    return
     else:
         return 'error'
 
