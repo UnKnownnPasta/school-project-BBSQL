@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import messagebox
 import mysql.connector as sql
-
 root = Tk()
 img = PhotoImage(file='plus.png')
 db = 'school'
+password = 'root'
 
 def create_label(tw, text, x, y, font):
     label = Label(tw, text=text, font=font)
@@ -42,7 +42,7 @@ def main(): # Login Screen
     pwField = Entry(root, show='*')
     pwField.place(x=150, y=140)
 
-    loginBtn = Button(root, text='Submit', relief=RIDGE, padx=40, command=lambda: unpwCheck(unField.get(), pwField.get()))
+    loginBtn = Button(root, text='Submit', relief=RIDGE, padx=40, command=lambda: unpwCheck(str(unField.get()), str(pwField.get())))
     loginBtn.place(x=150, y=200)
 
 
@@ -52,9 +52,9 @@ def unpwCheck(un, pw): # username, password
     widgets = [signinLabel, usernameLbl, passwLbl, unField, pwField, loginBtn]
 
     # Check Login Details
-    if (un != '' or pw !=''):
-        return messagebox.showerror('Error', 'Invalid Login details')
-    elif un == '' and pw == '':
+    if un != 'aecs' or pw != password:
+        messagebox.showerror('Error', 'Invalid Login details')
+    else:
         # Remove widgets as we're going out of login screen
         for i in widgets:
             i.destroy()
@@ -68,7 +68,7 @@ def unpwCheck(un, pw): # username, password
 
 # Function that handles the main window after login
 def detailsWindow(passw) -> None:
-    con = sql.connect(host='localhost', user='root', password='root')
+    con = sql.connect(host='localhost', user='root', password=passw)
 
     if con.is_connected():
         root.geometry('700x500') # Resize window
@@ -79,7 +79,7 @@ def detailsWindow(passw) -> None:
         text_1 = create_label(root, '| INITIALIZE', 40, 15, ('Franklin Gothic', 20))
 
         OutputLbl = create_label(root, 'Output', 40, 330, ('Lucida Console', 8))
-        OutputLbl.config(width=90, justify=LEFT, height=12, bg='white', highlightbackground="black", highlightthickness=1, padx=10)
+        OutputLbl.config(width=90, justify=LEFT, height=12, bg='white', highlightbackground="black", highlightthickness=1, padx=6)
       
         # A dictionary containing all color, border font stuff of buttons
         buttonLooks = {
@@ -93,14 +93,10 @@ def detailsWindow(passw) -> None:
 
         text_2 = create_label(root, '| COMMANDS', 40, 120, ('Franklin Gothic', 20))
 
-        QueryBtn = Button(root, command= lambda: Query(), text='Query',  **buttonLooks)
-        QueryBtn.place(x=40, y=170)
-        InsertBtn = Button(root, command= lambda: Insert(), text='Insert Record',  **buttonLooks)
-        InsertBtn.place(x=160, y=170)
-        DeleteBtn = Button(root, command= lambda: Destroy(), text='Delete Record',  **buttonLooks)
-        DeleteBtn.place(x=349, y=170)
-        UpdateBtn = Button(root, command= lambda: Update(), text='Update Record',  **buttonLooks)
-        UpdateBtn.place(x=40, y=215)
+        QueryBtn = create_button(root, lambda: Query(), 'Query', 40, 170)
+        InsertBtn = create_button(root, lambda: Insert(), 'Insert Record', 160, 170)
+        DeleteBtn = create_button(root, lambda: Destroy(), 'Delete Record', 349, 170)
+        UpdateBtn = create_button(root, lambda: Update(), 'Update Record', 40, 215)
 
         def clearOpt(): OutputLbl['text'] = ''
 
@@ -170,7 +166,7 @@ def detailsWindow(passw) -> None:
                 t = '{:<10}{:<20}{:<10}{:<20}{:<10}'
                 v = '{:<10}{:<12}{:<15}{:<12}{:<20}{:<10}{:<10}'
 
-                if selectEntry_2.get() == 'Donor':
+                if selectEntry_2.get().lower() == 'donor':
                     header = t.format('DonorID', 'DonorName', 'DonorAge', 'DonorAddress', 'BloodType')                        
                 else:
                     header = v.format('DonorID', 'ReceiverID', 'ReceiverName', 'ReceiverAge', 'ReceiverAddress', 'BloodType', 'Date')
@@ -178,7 +174,7 @@ def detailsWindow(passw) -> None:
                 output = [header]  # store the lines in a list
 
                 for row in rows:
-                    if selectEntry_2.get() == 'Donor':
+                    if selectEntry_2.get().lower() == 'donor':
                         line = t.format(*row)
                     else:
                         line = v.format(*[str(i) for i in row])
