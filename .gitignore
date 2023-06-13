@@ -1,4 +1,5 @@
 /src
-it-s/pre-*
+its/pre-*
 prottp-0.py
-it-s
+its/*
+!its/v1
