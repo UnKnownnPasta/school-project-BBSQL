@@ -3,3 +3,4 @@ its/pre-*
 prottp-0.py
 its/*
 !its/v1
+/.vscode/

@@ -35,7 +35,7 @@ def SignUp():
 
     def setText(entry, defText):
         entry.delete(0, END) if entry.get().strip() == defText else None
-
+        
     def restoreText(entry, defText):
         entry.insert(0, defText) if entry.get().strip() == "" else None
 
@@ -44,23 +44,29 @@ def SignUp():
     hospName.bind('<FocusIn>', lambda event: setText(hospName, 'Hospital Name'))
     hospName.bind('<FocusOut>', lambda event: restoreText(hospName, 'Hospital Name'))
 
-    pinCode = Entry(root, bd=16, relief=FLAT, width=70)
+    pinCode = Entry(root, bd=16, relief=FLAT, width=22)
     pinCode.insert(0, 'Pin Code')
     pinCode.bind('<FocusIn>', lambda event: setText(pinCode, 'Pin Code'))
     pinCode.bind('<FocusOut>', lambda event: restoreText(pinCode, 'Pin Code'))
 
-    Contact = Entry(root, bd=16, relief=FLAT, width=70)
+    Contact = Entry(root, bd=16, relief=FLAT, width=40)
     Contact.insert(0, 'Contact (Phone No./email)')
     Contact.bind('<FocusIn>', lambda event: setText(Contact, 'Contact (Phone No./email)'))
     Contact.bind('<FocusOut>', lambda event: restoreText(Contact, 'Contact (Phone No./email)'))
     
+    PassWord = Entry(root, bd=16, relief=FLAT, width=70)
+    PassWord.insert(0, 'Enter a Strong Password')
+    PassWord.bind('<FocusIn>', lambda event: setText(PassWord, 'Enter a Strong Password'))
+    PassWord.bind('<FocusOut>', lambda event: restoreText(PassWord, 'Enter a Strong Password'))
+
 
     swchBtnSu = Button(root, command=switchS_L, image=arrow, relief=FLAT, bd=0, highlightthickness=0, activebackground='#ad1e1e')
-    submBtnSu = Button(root, text='Submit', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command= lambda: SignSubm(pinCode.get(), Contact.get(), hospName.get()))
+    submBtnSu = Button(root, text='Submit', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command= lambda: SignSubm(pinCode.get(), Contact.get(), hospName.get(), PassWord.get()))
 
     hospName.place(x=240, y=250)
     pinCode.place(x=240, y=310)
-    Contact.place(x=240, y=370)
+    Contact.place(x=420, y=310)
+    PassWord.place(x=240, y=370)
     submBtnSu.place(x=425, y=430)
     swchBtnSu.place(x=770, y=30)
 
@@ -114,7 +120,7 @@ def switchL_S(): # Login to Signup
     SignUp()
 
 
-def SignSubm(pstCde, cntct, hospNme):
+def SignSubm(pstCde, cntct, hospNme, paswrd):
     verf = pinVerify(pstCde)
     if verf == False:
         messagebox.showerror('Failed', 'Invalid Pin Code.')
@@ -125,6 +131,7 @@ def SignSubm(pstCde, cntct, hospNme):
     if len(cntct) == 0 or cntct == 'Contact (Phone No./email)':
         messagebox.showerror('Failed', 'No Valid Contacts provided.')
         return
+        
     messagebox.showinfo('Success', 'Account created successfully! Login to it here')
     switchS_L()
 
@@ -185,5 +192,5 @@ def program(un, pw):
     a = Button(root, text= 'a', command= lambda: scroll_text('   nyooooooooom   '))
     a.place(x=30, y=300)
     
-Login()
+SignUp()
 root.mainloop()
