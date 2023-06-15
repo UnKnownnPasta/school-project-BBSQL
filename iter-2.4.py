@@ -1,23 +1,27 @@
 from tkinter import messagebox, font, ttk
 from tkinter import *
 import mysql.connector as sql
-import time
+import time, re
+from PIL import Image, ImageTk
 
 global con, cur
 con = sql.connect(host='localhost', user='root', password='root')
 cur = con.cursor()
 cur.execute('use bloodbank')
 
-global root, bg_img, logo_img
+
+global root, bg_img, logo_img, arrow
 root = Tk()
 bg_img_1 = PhotoImage(file='bg-blur-v2.png')
 bg_img_2 = PhotoImage(file='bg-unblur.png')
 logo_img = PhotoImage(file='l3-2.png')
 logo_img2 = PhotoImage(file='l2-2.png')
+arrow = PhotoImage(file='skills-3.png')
 root.title('Blood Bank Mng')
 root.iconphoto(False, PhotoImage(file='logo.png'))
 root.geometry(f"{940}x{500}+{(root.winfo_screenwidth() - 940) // 2}+{(root.winfo_screenheight() - 500) // 2}")
 root.resizable(False, False)
+
 
 def SignUp():
     global hospName, pinCode, Contact, submBtnSu, canvasSu, swchBtnSu
@@ -25,39 +29,41 @@ def SignUp():
     canvasSu.create_image(0, 0, image=bg_img_1, anchor='nw')
     canvasSu.pack(side = "top", fill = "both", expand = True)
 
-    sText = canvasSu.create_text(240, 180, text='Enter Details to Create A Account..', anchor='nw', font=('Josefin Sans', 17), fill='white')
-    altText = canvasSu.create_text(320, 48, text='BLOOD BANK MANAGEMENT', anchor='nw', font=('Josefin Sans', 20, 'bold'), fill='white')
+    sText = canvasSu.create_text(240, 180, text='Enter Details to Create A Account..', anchor=NW, font=('Josefin Sans', 17), fill='white')
+    altText = canvasSu.create_text(320, 48, text='BLOOD BANK MANAGEMENT', anchor=NW, font=('Josefin Sans', 20, 'bold'), fill='white')
     canvasSu.create_image(230, 30, image=logo_img2, anchor=NW)
 
-    def on_focus_1(event): hospName.delete(0, 'end') if hospName.get().strip() == "Hospital Name"  else None
-    def on_focus_2(event): pinCode.delete(0, 'end') if pinCode.get().strip() == "Pin Code" else None
-    def on_focus_3(event): Contact.delete(0, 'end') if Contact.get().strip() == "Contact (Phone No./email)" else None
-    def off_focus_1(event): hospName.insert(0, 'Hospital Name') if hospName.get().strip() == "" else None
-    def off_focus_2(event): pinCode.insert(0, 'Pin Code') if pinCode.get().strip() == "" else None
-    def off_focus_3(event): Contact.insert(0, 'Contact (Phone No./email)') if Contact.get().strip() == "" else None
+    def setText(entry, defText):
+        entry.delete(0, END) if entry.get().strip() == defText else None
+
+    def restoreText(entry, defText):
+        entry.insert(0, defText) if entry.get().strip() == "" else None
+
     hospName = Entry(root, bd=16, relief=FLAT, width=70)
     hospName.insert(0, 'Hospital Name')
-    hospName.bind('<FocusIn>', on_focus_1)
-    hospName.bind('<FocusOut>', off_focus_1)
+    hospName.bind('<FocusIn>', lambda event: setText(hospName, 'Hospital Name'))
+    hospName.bind('<FocusOut>', lambda event: restoreText(hospName, 'Hospital Name'))
 
     pinCode = Entry(root, bd=16, relief=FLAT, width=70)
     pinCode.insert(0, 'Pin Code')
-    pinCode.bind('<FocusIn>', on_focus_2)
-    pinCode.bind('<FocusOut>', off_focus_2)
+    pinCode.bind('<FocusIn>', lambda event: setText(pinCode, 'Pin Code'))
+    pinCode.bind('<FocusOut>', lambda event: restoreText(pinCode, 'Pin Code'))
 
     Contact = Entry(root, bd=16, relief=FLAT, width=70)
     Contact.insert(0, 'Contact (Phone No./email)')
-    Contact.bind('<FocusIn>', on_focus_3)
-    Contact.bind('<FocusOut>', off_focus_3)
+    Contact.bind('<FocusIn>', lambda event: setText(Contact, 'Contact (Phone No./email)'))
+    Contact.bind('<FocusOut>', lambda event: restoreText(Contact, 'Contact (Phone No./email)'))
+    
 
-    swchBtnSu = Button(root, text='Log in', command=switchS_L)
-    submBtnSu = Button(root, text='Submit', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command=SignSubm)
+    swchBtnSu = Button(root, command=switchS_L, image=arrow, relief=FLAT, bd=0, highlightthickness=0, activebackground='#ad1e1e')
+    submBtnSu = Button(root, text='Submit', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command= lambda: SignSubm(pinCode.get(), Contact.get(), hospName.get()))
 
     hospName.place(x=240, y=250)
     pinCode.place(x=240, y=310)
     Contact.place(x=240, y=370)
     submBtnSu.place(x=425, y=430)
-    swchBtnSu.place(x=870, y=30)
+    swchBtnSu.place(x=770, y=30)
+
 
 def Login():
     global canvasLi, userName, userPass, submBtnLi, signBtnLi
@@ -71,19 +77,21 @@ def Login():
     sText = canvasLi.create_text(240, 180, text='Sign In', anchor='nw', font=('Franklin Gothic', 16, 'bold'), fill='white')
     altText = canvasLi.create_text(240, 200, text='Fill in details to gain access', anchor='nw', font=('Josefin Sans', 14), fill='white')
 
-    def on_focus_1(event): userName.delete(0, 'end') if userName.get().strip() == "User Name"  else None
-    def on_focus_2(event): userPass.delete(0, 'end') if userPass.get().strip() == "Password" else None
-    def off_focus_1(event): userName.insert(0, 'User Name') if userName.get().strip() == "" else None
-    def off_focus_2(event): userPass.insert(0, 'Password') if userPass.get().strip() == "" else None
+    def setText(entry, defText):
+        entry.delete(0, END) if entry.get().strip() == defText else None
+
+    def restoreText(entry, defText):
+        entry.insert(0, defText) if entry.get().strip() == "" else None
+
     userName = Entry(root, bd=16, relief=FLAT, width=70)
     userName.insert(0, 'User Name')
-    userName.bind('<FocusIn>', on_focus_1)
-    userName.bind('<FocusOut>', off_focus_1)
+    userName.bind('<FocusIn>', lambda event: setText(userName, 'User Name'))
+    userName.bind('<FocusOut>', lambda event: restoreText(userName, 'User Name'))
 
     userPass = Entry(root, bd=16, relief=FLAT, width=70)
     userPass.insert(0, 'Password')
-    userPass.bind('<FocusIn>', on_focus_2)
-    userPass.bind('<FocusOut>', off_focus_2)
+    userPass.bind('<FocusIn>', lambda event: setText(userPass, 'Password'))
+    userPass.bind('<FocusOut>', lambda event: restoreText(userPass, 'Password'))
 
     submBtnLi = Button(root, text='Login', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command= lambda: program(userName.get(), userPass.get()))
     signBtnLi = Button(root, text='Sign Up', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command=switchL_S)
@@ -93,26 +101,54 @@ def Login():
     submBtnLi.place(x=370, y=380)
     signBtnLi.place(x=460, y=380)
 
-def switchS_L():
+
+def switchS_L(): # Signup to Login
     w = [hospName, pinCode, Contact, submBtnSu, canvasSu, swchBtnSu]
     for i in w:
         i.destroy()
     Login()
-
-def SignSubm():
-    print(pinCode.get(), Contact.get(), hospName.get())
-    switchS_L()
-
-def switchL_S():
+def switchL_S(): # Login to Signup
     w = [canvasLi, userName, userPass, submBtnLi, signBtnLi]
     for i in w:
         i.destroy()
     SignUp()
 
+
+def SignSubm(pstCde, cntct, hospNme):
+    verf = pinVerify(pstCde)
+    if verf == False:
+        messagebox.showerror('Failed', 'Invalid Pin Code.')
+        return
+    if hospNme == 'Hospital Name' or len(hospNme) == 0:
+        messagebox.showerror('Failed', 'Invalid Hospital Name.')
+        return
+    if len(cntct) == 0 or cntct == 'Contact (Phone No./email)':
+        messagebox.showerror('Failed', 'No Valid Contacts provided.')
+        return
+    messagebox.showinfo('Success', 'Account created successfully! Login to it here')
+    switchS_L()
+
+
+def pinVerify(pin) -> True:
+    if not pin.isdigit() or pin[0] == '0' or len(pin) != 6:
+        return False
+    invalid = [29, 35, 54, 55, 65, 66]
+    if pin[:2] in invalid:
+        return False
+    reg = open('validrange.txt')
+    status = False
+    for i in range(8):
+        regx = reg.readline().strip().replace('/', '')
+        m = re.findall(regx, pin)
+        if len(m) != 0:
+            status = True
+    return status
+
+
 def program(un, pw):
-    # w_super = [canvasLi, userName, userPass, submBtnLi, signBtnLi]
-    # for i in w_super:
-    #     i.destroy()
+    w_super = [canvasLi, userName, userPass, submBtnLi, signBtnLi]
+    for i in w_super:
+        i.destroy()
     
     title_bar = Frame(root, bg="#D22B2B", height=30)
     title_bar.pack(fill=X)
