@@ -1,23 +1,34 @@
-from tkinter import messagebox, font, ttk
+from tkinter import messagebox
 from tkinter import *
 import mysql.connector as sql
 from re import findall
-from time import sleep
-
+from PIL import Image, ImageTk
+globpassw = 'root'
 
 def init():
-    global bg_img_1, bg_img_2, logo_img, logo_img2, arrow, root
-    # root.geometry(f"{300}x{300}+{(root.winfo_screenwidth() - 300) // 2}+{(root.winfo_screenheight() - 300) // 2}")
+    global bg_img_1, bg_img_2, logo_img, logo_80, logo_120, arrow, root, blob, hb_prof, topRoot
+    
     root = Tk()
+    # root.withdraw() # TEMP
+    topRoot = Toplevel(root)
+    topRoot.title('Profile')
+    topRoot.geometry('500x400+270+200')
+    topRoot.iconphoto(False, PhotoImage(file='logo-nosh.png'))
+
+    topRoot.withdraw()
+    topRoot.protocol('WM_DELETE_WINDOW', DEL_EVENT)
     bg_img_1 = PhotoImage(file='bg-blur-v2.png')
     bg_img_2 = PhotoImage(file='bg-unblur.png')
-    logo_img = PhotoImage(file='l3-2.png')
-    logo_img2 = PhotoImage(file='l2-2.png')
-    arrow = PhotoImage(file='skills-3.png')
+    logo_img = Image.open('logo-v2-sh.png')
+    logo_80 = ImageTk.PhotoImage(logo_img.resize([int(0.13 * s) for s in logo_img.size]))
+    logo_120 = ImageTk.PhotoImage(logo_img.resize([int(0.25 * s) for s in logo_img.size]))
+    arrow = PhotoImage(file='arrow.png')
+    blob = PhotoImage(file='box.png')
+    hb_prof = PhotoImage(file='profile.png')
 
     global con, cur
     try:
-        con = sql.connect(host='localhost', user='root', password='root')
+        con = sql.connect(host='localhost', user='root', password=globpassw)
         cur = con.cursor()
     except:
         messagebox.showerror('Error', 'Failed to connect to SQL')
@@ -36,10 +47,11 @@ def init():
         messagebox.showerror('Error', 'Something went wrong while initializing tables.')
 
     root.title('Blood Bank Mng')
-    root.iconphoto(False, PhotoImage(file='logo.png'))
+    root.iconphoto(False, PhotoImage(file='logo-nosh.png'))
     root.resizable(False, False)
     root.geometry(f"{940}x{500}+{(root.winfo_screenwidth() - 940) // 2}+{(root.winfo_screenheight() - 500) // 2}")
     Login()
+    # SignUp()
 
 
 def SignUp():
@@ -50,7 +62,7 @@ def SignUp():
 
     sText = canvasSu.create_text(240, 180, text='Enter Details to Create A Account..', anchor=NW, font=('Josefin Sans', 17), fill='white')
     altText = canvasSu.create_text(320, 48, text='BLOOD BANK MANAGEMENT', anchor=NW, font=('Josefin Sans', 20, 'bold'), fill='white')
-    canvasSu.create_image(230, 30, image=logo_img2, anchor=NW)
+    canvasSu.create_image(230, 30, image=logo_120, anchor=NW)
 
     def setText(entry, defText):
         entry.delete(0, END) if entry.get().strip() == defText else None
@@ -117,14 +129,16 @@ def Login():
     userPass.insert(0, 'Password')
     userPass.bind('<FocusIn>', lambda event: setText(userPass, 'Password'))
     userPass.bind('<FocusOut>', lambda event: restoreText(userPass, 'Password'))
+    userPass.bind('<Return>',  lambda event: loginSubm(userName.get(), userPass.get()))
 
     submBtnLi = Button(root, text='Login', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command= lambda: loginSubm(userName.get(), userPass.get()))
     signBtnLi = Button(root, text='Sign Up', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command=switchL_S)
+    orLbl = canvasLi.create_text(440, 385, text='..OR..', anchor='nw', font=('Josefin Sans', 14), fill='white')
 
     userName.place(x=240, y=260)
     userPass.place(x=240, y=320)
-    submBtnLi.place(x=370, y=380)
-    signBtnLi.place(x=460, y=380)
+    submBtnLi.place(x=353, y=380)
+    signBtnLi.place(x=485, y=380)
 
 
 def switchS_L(): # Signup to Login
@@ -176,10 +190,9 @@ def loginSubm(un, pw):
     if res == None:
         messagebox.showerror('Error', 'Login details are not correct.')
         return
-    ww = [canvasLi, userName, userPass, submBtnLi, signBtnLi]
-    for x in ww:
-        x.destroy()
-    program(un, pw)
+    cur.execute('select HospitalID, PinCode from Hospital where HospitalName=%s', (un,))
+    hId, pc = [i for i in cur.fetchall()[0]]
+    program(un, pw, hId, pc)
 
 
 def pinVerify(pin) -> True:
@@ -198,16 +211,26 @@ def pinVerify(pin) -> True:
     return status
 
 
-def program(u, p):
+def program(u, p, i, pc):
+    ww = [canvasLi, userName, userPass, submBtnLi, signBtnLi]
+    for x in ww:
+        x.destroy()
+        
     title_bar = Frame(root, bg="#D22B2B", height=30)
     title_bar.pack(fill=X)
-    title_bar.place(rely=0.05, relwidth=1) # relwidth gives the fill to be 100%, rely keeps it 500*0.05 = 25 pixels from top
+    title_bar.place(rely=0.045, relwidth=1)
+    # home_bar = Frame(root, bg="#D22B2B", width=100)
+    # home_bar.pack(fill=Y)
+    # home_bar.place(relx=0.9, relheight=1) # relwidth gives the fill to be 100%, rely keeps it 500*0.05 = 25 pixels from top
 
-    image_label = Label(title_bar, bg="#D22B2B", image=logo_img)
+    image_label = Label(title_bar, bg="#D22B2B", image=logo_80)
     image_label.pack(side=LEFT)
 
     title_label = Label(root, text="Blood Bank Management", fg="white", bg="#D22B2B", font=('Josefin Sans', 17), pady=0)
     title_label.place(x=50, y=25)
+
+    profile_lbl = Button(root, image=hb_prof, bg="#D22B2B", relief=FLAT, activebackground="#D22B2B", command= lambda: profile(u, i, pc))
+    profile_lbl.place(x=830, y=25)
 
     global storage
     storage = ["", 0]
@@ -226,15 +249,46 @@ def program(u, p):
         if not storage[1]:
             storage[1] = 1; rotate()
 
-
     scrollbar = Label(root, font=("Arial", 12), anchor=NE, bg="black", fg="white", width=104)
-    scrollbar.place(x=0, y=1)
+    scrollbar.place(x=0, y=0)
     scroll_text(f'   Welcome {u}!   ')
     
-    a = Button(root, text= 'a', command= lambda: scroll_text('   nyooooooooom   '))
-    a.place(x=30, y=300)
-    
+    # a = Button(root, text= 'a', command= lambda: scroll_text('   nyooooooooom   '))
+    # a.place(x=30, y=300)
+    preview()
+
+def preview():
+    prev1 = Label(root, image=blob)
+    prev2 = Label(root, image=blob)
+
+    prev1.place(x=20, y=200)
+    prev2.place(x=350, y=200)
+
+    dash = Label(root, text='', font=('Open Sans', 30))
+    dash.place(x=20, y=150)
+
+
+def DEL_EVENT(): 
+    topRoot.withdraw()
+    profCanvas.destroy()
+
+def profile(user, hid, pin):
+    topRoot.deiconify()
+    global profimg, profCanvas
+    profimg = ImageTk.PhotoImage(Image.open('profile-page.png'))
+
+    profCanvas = Canvas(topRoot, width=500, height=400)
+    profCanvas.pack(fill=BOTH)
+    profCanvas.create_image(0, 0, image=profimg, anchor=NW)
+    profCanvas.create_image(53, 53, image=hb_prof, anchor=NW)
+
+    fonval = ('Josefin Sans', 27)
+    profCanvas.create_text(60, 150, text=f'Hospital: {user}', font=fonval, fill='white', anchor=NW)
+    profCanvas.create_text(60, 200, text=f'Hospital ID: {hid}', font=fonval, fill='white', anchor=NW)
+    profCanvas.create_text(60, 250, text=f'Pin Code: {pin}', font=fonval, fill='white', anchor=NW)
+
 if __name__ == '__main__':
     # Start program
     init()
+    # program('lions', 'root', '123', '1235')
     root.mainloop()
