@@ -3,11 +3,14 @@ from tkinter import *
 import mysql.connector as sql
 from re import findall
 from PIL import Image, ImageTk
+import ctypes
 globpassw = 'root'
 
 def init():
-    global bg_img_1, bg_img_2, logo_img, logo_80, logo_120, arrow, root, blob, hb_prof, topRoot
+    global bg_img_1, bg_img_2, logo_img, logo_80, logo_120, arrow, root, blob, profImg, topRoot
     
+    ctypes.windll.gdi32.AddFontResourceA('filedump/JosefinSans-Regular.tff')
+
     root = Tk()
     # root.withdraw() # TEMP
     topRoot = Toplevel(root)
@@ -17,6 +20,8 @@ def init():
 
     topRoot.withdraw()
     topRoot.protocol('WM_DELETE_WINDOW', DEL_EVENT)
+
+    # Defined here since it wouldn't load otherwise
     bg_img_1 = PhotoImage(file='bg-blur-v2.png')
     bg_img_2 = PhotoImage(file='bg-unblur.png')
     logo_img = Image.open('logo-v2-sh.png')
@@ -24,7 +29,7 @@ def init():
     logo_120 = ImageTk.PhotoImage(logo_img.resize([int(0.25 * s) for s in logo_img.size]))
     arrow = PhotoImage(file='arrow.png')
     blob = PhotoImage(file='box.png')
-    hb_prof = PhotoImage(file='profile.png')
+    profImg = PhotoImage(file='profile.png')
 
     global con, cur
     try:
@@ -229,7 +234,7 @@ def program(u, p, i, pc):
     title_label = Label(root, text="Blood Bank Management", fg="white", bg="#D22B2B", font=('Josefin Sans', 17), pady=0)
     title_label.place(x=50, y=25)
 
-    profile_lbl = Button(root, image=hb_prof, bg="#D22B2B", relief=FLAT, activebackground="#D22B2B", command= lambda: profile(u, i, pc))
+    profile_lbl = Button(root, image=profImg, bg="#D22B2B", relief=FLAT, activebackground="#D22B2B", command= lambda: profile(u, i, pc))
     profile_lbl.place(x=830, y=25)
 
     global storage
@@ -280,7 +285,7 @@ def profile(user, hid, pin):
     profCanvas = Canvas(topRoot, width=500, height=400)
     profCanvas.pack(fill=BOTH)
     profCanvas.create_image(0, 0, image=profimg, anchor=NW)
-    profCanvas.create_image(53, 53, image=hb_prof, anchor=NW)
+    profCanvas.create_image(53, 53, image=profImg, anchor=NW)
 
     fonval = ('Josefin Sans', 27)
     profCanvas.create_text(60, 150, text=f'Hospital: {user}', font=fonval, fill='white', anchor=NW)
