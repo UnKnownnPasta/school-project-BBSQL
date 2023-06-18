@@ -4,6 +4,7 @@ import mysql.connector as sql
 from re import findall
 import ctypes, os
 globpassw = 'root'
+current_dir = os.path.dirname(__file__)
 
 def create_entry(control, varx, vary, text, *args, **kwargs):
     entry = Entry(control, args,  bd=16, relief=FLAT, **kwargs)
@@ -20,7 +21,6 @@ def create_button(control, text, varx, vary, **kwargs):
 def init():
     global arrow, root, blob, topRoot, globalImg
     root = Tk()
-    current_dir = os.path.dirname(__file__)
 
     # Defined here since it wouldn't load otherwise
     bg_img_1 = PhotoImage(file=os.path.join(current_dir, 'bg/bg-blur-v2.png'))
