@@ -2,33 +2,46 @@ from tkinter import messagebox
 from tkinter import *
 import mysql.connector as sql
 from re import findall
-import ctypes
+import ctypes, os
 globpassw = 'root'
+
+def create_entry(control, varx, vary, text, *args, **kwargs):
+    entry = Entry(control, args,  bd=16, relief=FLAT, **kwargs)
+    entry.place(x=varx, y=vary)
+    entry.insert(0, text)
+    return entry
+
+def create_button(control, text, varx, vary, **kwargs):
+    button = Button(control, text=text, background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', **kwargs)
+    button.place(x=varx, y=vary)
+    return button
+
 
 def init():
     global arrow, root, blob, topRoot, globalImg
     root = Tk()
+    current_dir = os.path.dirname(__file__)
 
     # Defined here since it wouldn't load otherwise
-    bg_img_1 = PhotoImage(file='bg-blur-v2.png')
-    bg_img_2 = PhotoImage(file='bg-unblur.png')
+    bg_img_1 = PhotoImage(file=os.path.join(current_dir, 'bg/bg-blur-v2.png'))
+    bg_img_2 = PhotoImage(file=os.path.join(current_dir, 'bg/bg-unblur.png'))
     #logo_img = Image.open('logo-v2-sh.png')
-    logo_80 = PhotoImage(file='logo-80.png') #ImageTk.PhotoImage(logo_img.resize([int(0.13 * s) for s in logo_img.size]))
-    logo_120 = PhotoImage(file='logo-120.png') #ImageTk.PhotoImage(logo_img.resize([int(0.25 * s) for s in logo_img.size]))
-    arrow = PhotoImage(file='arrow.png')
-    blob = PhotoImage(file='box.png')
-    profImg = PhotoImage(file='profile.png')
+    logo_80 = PhotoImage(file=os.path.join(current_dir, 'src/logo-80.png')) #ImageTk.PhotoImage(logo_img.resize([int(0.13 * s) for s in logo_img.size]))
+    logo_120 = PhotoImage(file=os.path.join(current_dir, 'src/logo-120.png')) #ImageTk.PhotoImage(logo_img.resize([int(0.25 * s) for s in logo_img.size]))
+    arrow = PhotoImage(file=os.path.join(current_dir, 'src/arrow.png'))
+    blob = PhotoImage(file=os.path.join(current_dir, 'src/box.png'))
+    profImg = PhotoImage(file=os.path.join(current_dir, 'src/profile.png'))
 
-    # Makes the images accessible globally
+    # Makes the images accessible globally -- as globalImg[n] n being item index
     globalImg = [bg_img_1, bg_img_2, logo_80, logo_120, profImg]
 
-    ctypes.windll.gdi32.AddFontResourceA('JosefinSans-Regular.tff')
+    ctypes.windll.gdi32.AddFontResourceA(os.path.join(current_dir, 'JosefinSans-Regular.ttf'))
 
     topRoot = Toplevel(root)
     topRoot.withdraw()
     topRoot.title('Profile')
     topRoot.geometry('500x400+270+200')
-    topRoot.iconphoto(False, PhotoImage(file='logo-nosh.png'))
+    topRoot.iconphoto(False, PhotoImage(file=os.path.join(current_dir, 'src/logo-nosh.png')))
 
     topRoot.protocol('WM_DELETE_WINDOW', DEL_EVENT)
 
@@ -52,8 +65,9 @@ def init():
     except:
         messagebox.showerror('Error', 'Something went wrong while initializing tables.')
 
+    con.commit()
     root.title('Blood Bank Mng')
-    root.iconphoto(False, PhotoImage(file='logo-nosh.png'))
+    root.iconphoto(False, PhotoImage(file=os.path.join(current_dir, 'src/logo-nosh.png')))
     root.resizable(False, False)
     root.geometry(f"{940}x{500}+{(root.winfo_screenwidth() - 940) // 2}+{(root.winfo_screenheight() - 500) // 2}")
     Login()
@@ -76,35 +90,25 @@ def SignUp():
     def restoreText(entry, defText):
         entry.insert(0, defText) if entry.get().strip() == "" else None
 
-    hospName = Entry(root, bd=16, relief=FLAT, width=70)
-    hospName.insert(0, 'Hospital Name')
+    hospName = create_entry(root, 240, 250, 'Hospital Name', width=70)
     hospName.bind('<FocusIn>', lambda event: setText(hospName, 'Hospital Name'))
     hospName.bind('<FocusOut>', lambda event: restoreText(hospName, 'Hospital Name'))
 
-    pinCode = Entry(root, bd=16, relief=FLAT, width=22)
-    pinCode.insert(0, 'Pin Code')
+    pinCode = create_entry(root, 240, 310, 'Pin Code', width=22)
     pinCode.bind('<FocusIn>', lambda event: setText(pinCode, 'Pin Code'))
     pinCode.bind('<FocusOut>', lambda event: restoreText(pinCode, 'Pin Code'))
 
-    Contact = Entry(root, bd=16, relief=FLAT, width=40)
-    Contact.insert(0, 'Contact (Phone No./email)')
+    Contact = create_entry(root, 420, 310, 'Contact (Phone No./email)', width=40)
     Contact.bind('<FocusIn>', lambda event: setText(Contact, 'Contact (Phone No./email)'))
     Contact.bind('<FocusOut>', lambda event: restoreText(Contact, 'Contact (Phone No./email)'))
     
-    PassWord = Entry(root, bd=16, relief=FLAT, width=70)
-    PassWord.insert(0, 'Enter a Strong Password')
+    PassWord = create_entry(root, 240, 370, 'Enter a Strong Password', width=70)
     PassWord.bind('<FocusIn>', lambda event: setText(PassWord, 'Enter a Strong Password'))
     PassWord.bind('<FocusOut>', lambda event: restoreText(PassWord, 'Enter a Strong Password'))
 
-
     swchBtnSu = Button(root, command=switchS_L, image=arrow, relief=FLAT, bd=0, highlightthickness=0, activebackground='#ad1e1e')
-    submBtnSu = Button(root, text='Submit', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command= lambda: SignSubm(pinCode.get(), Contact.get(), hospName.get(), PassWord.get()))
+    submBtnSu = create_button(root, 'Submit', 425, 430, command= lambda: SignSubm(pinCode.get(), Contact.get(), hospName.get(), PassWord.get()))
 
-    hospName.place(x=240, y=250)
-    pinCode.place(x=240, y=310)
-    Contact.place(x=420, y=310)
-    PassWord.place(x=240, y=370)
-    submBtnSu.place(x=425, y=430)
     swchBtnSu.place(x=770, y=30)
 
 
@@ -126,25 +130,19 @@ def Login():
     def restoreText(entry, defText):
         entry.insert(0, defText) if entry.get().strip() == "" else None
 
-    userName = Entry(root, bd=16, relief=FLAT, width=70)
-    userName.insert(0, 'User Name')
+    userName = create_entry(root, 240, 260, 'User Name', width=70)
     userName.bind('<FocusIn>', lambda event: setText(userName, 'User Name'))
     userName.bind('<FocusOut>', lambda event: restoreText(userName, 'User Name'))
 
-    userPass = Entry(root, bd=16, relief=FLAT, width=70)
-    userPass.insert(0, 'Password')
+    userPass = create_entry(root, 240, 320, 'Password', width=70)
     userPass.bind('<FocusIn>', lambda event: setText(userPass, 'Password'))
     userPass.bind('<FocusOut>', lambda event: restoreText(userPass, 'Password'))
     userPass.bind('<Return>',  lambda event: loginSubm(userName.get(), userPass.get()))
 
-    submBtnLi = Button(root, text='Login', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command= lambda: loginSubm(userName.get(), userPass.get()))
-    signBtnLi = Button(root, text='Sign Up', background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', command=switchL_S)
+    submBtnLi = create_button(root, 'Login', 353, 380, command= lambda: loginSubm(userName.get(), userPass.get()))
+    signBtnLi = create_button(root, 'Sign Up', 485, 380, command=switchL_S)
+   
     orLbl = canvasLi.create_text(440, 385, text='..OR..', anchor='nw', font=('Josefin Sans', 14), fill='white')
-
-    userName.place(x=240, y=260)
-    userPass.place(x=240, y=320)
-    submBtnLi.place(x=353, y=380)
-    signBtnLi.place(x=485, y=380)
 
 
 def switchS_L(): # Signup to Login
@@ -229,7 +227,7 @@ def program(u, p, i, pc):
     title_bar = Frame(root, bg="#D22B2B", height=30)
     title_bar.pack(fill=X)
     title_bar.place(rely=0.045, relwidth=1)
-    img = [PhotoImage(file='menu.png'), PhotoImage(file='cog.png')]
+    img = [PhotoImage(file=os.path.join(current_dir, 'src/menu.png')), PhotoImage(file=os.path.join(current_dir, 'src/cog.png'))]
     # home_bar = Frame(root, bg="#D22B2B", width=100)
     # home_bar.pack(fill=Y)
     # home_bar.place(relx=0.9, relheight=1) # relwidth gives the fill to be 100%, rely keeps it 500*0.05 = 25 pixels from top
@@ -303,7 +301,7 @@ def DEL_EVENT():
 def profile(user, hid, pin):
     topRoot.deiconify()
     global profBg, profCanvas
-    profBg = PhotoImage(file='profile-page.png')
+    profBg = PhotoImage(file=os.path.join(current_dir, 'bg/profile-page.png'))
 
     profCanvas = Canvas(topRoot, width=500, height=400)
     profCanvas.pack(fill=BOTH)
