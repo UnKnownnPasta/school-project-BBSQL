@@ -2,34 +2,35 @@ from tkinter import messagebox
 from tkinter import *
 import mysql.connector as sql
 from re import findall
-from PIL import Image, ImageTk
 import ctypes
 globpassw = 'root'
 
 def init():
-    global bg_img_1, bg_img_2, logo_img, logo_80, logo_120, arrow, root, blob, profImg, topRoot
-    
-    ctypes.windll.gdi32.AddFontResourceA('filedump/JosefinSans-Regular.tff')
-
+    global arrow, root, blob, topRoot, globalImg
     root = Tk()
-    # root.withdraw() # TEMP
-    topRoot = Toplevel(root)
-    topRoot.title('Profile')
-    topRoot.geometry('500x400+270+200')
-    topRoot.iconphoto(False, PhotoImage(file='logo-nosh.png'))
-
-    topRoot.withdraw()
-    topRoot.protocol('WM_DELETE_WINDOW', DEL_EVENT)
 
     # Defined here since it wouldn't load otherwise
     bg_img_1 = PhotoImage(file='bg-blur-v2.png')
     bg_img_2 = PhotoImage(file='bg-unblur.png')
-    logo_img = Image.open('logo-v2-sh.png')
-    logo_80 = ImageTk.PhotoImage(logo_img.resize([int(0.13 * s) for s in logo_img.size]))
-    logo_120 = ImageTk.PhotoImage(logo_img.resize([int(0.25 * s) for s in logo_img.size]))
+    #logo_img = Image.open('logo-v2-sh.png')
+    logo_80 = PhotoImage(file='logo-80.png') #ImageTk.PhotoImage(logo_img.resize([int(0.13 * s) for s in logo_img.size]))
+    logo_120 = PhotoImage(file='logo-120.png') #ImageTk.PhotoImage(logo_img.resize([int(0.25 * s) for s in logo_img.size]))
     arrow = PhotoImage(file='arrow.png')
     blob = PhotoImage(file='box.png')
     profImg = PhotoImage(file='profile.png')
+
+    # Makes the images accessible globally
+    globalImg = [bg_img_1, bg_img_2, logo_80, logo_120, profImg]
+
+    ctypes.windll.gdi32.AddFontResourceA('JosefinSans-Regular.tff')
+
+    topRoot = Toplevel(root)
+    topRoot.withdraw()
+    topRoot.title('Profile')
+    topRoot.geometry('500x400+270+200')
+    topRoot.iconphoto(False, PhotoImage(file='logo-nosh.png'))
+
+    topRoot.protocol('WM_DELETE_WINDOW', DEL_EVENT)
 
     global con, cur
     try:
@@ -62,12 +63,12 @@ def init():
 def SignUp():
     global hospName, pinCode, Contact, submBtnSu, canvasSu, swchBtnSu, PassWord
     canvasSu = Canvas(root, width='940', height='500', highlightthickness=0)
-    canvasSu.create_image(0, 0, image=bg_img_1, anchor='nw')
+    canvasSu.create_image(0, 0, image=globalImg[0], anchor='nw')
     canvasSu.pack(side = "top", fill = "both", expand = True)
 
     sText = canvasSu.create_text(240, 180, text='Enter Details to Create A Account..', anchor=NW, font=('Josefin Sans', 17), fill='white')
     altText = canvasSu.create_text(320, 48, text='BLOOD BANK MANAGEMENT', anchor=NW, font=('Josefin Sans', 20, 'bold'), fill='white')
-    canvasSu.create_image(230, 30, image=logo_120, anchor=NW)
+    canvasSu.create_image(230, 30, image=globalImg[3], anchor=NW)
 
     def setText(entry, defText):
         entry.delete(0, END) if entry.get().strip() == defText else None
@@ -110,7 +111,7 @@ def SignUp():
 def Login():
     global canvasLi, userName, userPass, submBtnLi, signBtnLi
     canvasLi = Canvas(root, width='940', height='500', highlightthickness=0)
-    canvasLi.create_image(0, 0, image=bg_img_2, anchor='nw')
+    canvasLi.create_image(0, 0, image=globalImg[1], anchor='nw')
     canvasLi.pack(side = "top", fill = "both", expand = True)
 
     titleLabel1 = canvasLi.create_text(355, 58, text='ADMIN', anchor='nw', font=('Franklin Gothic', 25, 'bold'), fill='white')
@@ -220,22 +221,31 @@ def program(u, p, i, pc):
     ww = [canvasLi, userName, userPass, submBtnLi, signBtnLi]
     for x in ww:
         x.destroy()
+    global img, title_bar, scrollbar
+    btnLooks = {
+        "bg":"#D22B2B", "relief":"flat", "activebackground":"#D22B2B"
+    }
         
     title_bar = Frame(root, bg="#D22B2B", height=30)
     title_bar.pack(fill=X)
     title_bar.place(rely=0.045, relwidth=1)
+    img = [PhotoImage(file='menu.png'), PhotoImage(file='cog.png')]
     # home_bar = Frame(root, bg="#D22B2B", width=100)
     # home_bar.pack(fill=Y)
     # home_bar.place(relx=0.9, relheight=1) # relwidth gives the fill to be 100%, rely keeps it 500*0.05 = 25 pixels from top
 
-    image_label = Label(title_bar, bg="#D22B2B", image=logo_80)
-    image_label.pack(side=LEFT)
+    menu_btn = Button(title_bar, image=img[0], **btnLooks, )
+    menu_btn.pack(side=LEFT)
+    logo_lbl = Label(title_bar, bg="#D22B2B", image=globalImg[2])
+    logo_lbl.pack(side=LEFT, padx=10)
 
-    title_label = Label(root, text="Blood Bank Management", fg="white", bg="#D22B2B", font=('Josefin Sans', 17), pady=0)
-    title_label.place(x=50, y=25)
+    title_label = Label(title_bar, text=u.title(), fg="white", bg="#D22B2B", font=('Josefin Sans', 17), pady=0)
+    title_label.place(x=95, y=0)
 
-    profile_lbl = Button(root, image=profImg, bg="#D22B2B", relief=FLAT, activebackground="#D22B2B", command= lambda: profile(u, i, pc))
-    profile_lbl.place(x=830, y=25)
+    profile_btn = Button(title_bar, image=globalImg[4], command= lambda: profile(u, i, pc), **btnLooks)
+    profile_btn.place(x=830, y=0)
+    settings_btn = Button(title_bar, image=img[1], command= lambda: profile(u, i, pc), **btnLooks)
+    settings_btn.place(x=880, y=0)
 
     global storage
     storage = ["", 0]
@@ -256,21 +266,34 @@ def program(u, p, i, pc):
 
     scrollbar = Label(root, font=("Arial", 12), anchor=NE, bg="black", fg="white", width=104)
     scrollbar.place(x=0, y=0)
-    scroll_text(f'   Welcome {u}!   ')
+    scroll_text(f'   Welcome {u.title()}!   ')
     
     # a = Button(root, text= 'a', command= lambda: scroll_text('   nyooooooooom   '))
     # a.place(x=30, y=300)
-    preview()
+    # preview()
+    # profile(u, i, pc)
 
-def preview():
+
+
+def showData():
     prev1 = Label(root, image=blob)
     prev2 = Label(root, image=blob)
 
     prev1.place(x=20, y=200)
     prev2.place(x=350, y=200)
+    table_data = [
+        ['O', '12', '+'],
+        ['O', '7', '-'],
+        ['A', '8', '+'],
+        ['A', '16', '-'],
+    ]
 
-    dash = Label(root, text='', font=('Open Sans', 30))
-    dash.place(x=20, y=150)
+    # Create labels for table data
+    for row, data_row in enumerate(table_data, start=1):
+        for column, data in enumerate(data_row):
+            label = Label(root, text=data, relief=GROOVE, width=12)
+            label.grid(row=row, column=column)
+            label.place(x=20+column*100, y=100+row*30)
 
 
 def DEL_EVENT(): 
@@ -279,13 +302,13 @@ def DEL_EVENT():
 
 def profile(user, hid, pin):
     topRoot.deiconify()
-    global profimg, profCanvas
-    profimg = ImageTk.PhotoImage(Image.open('profile-page.png'))
+    global profBg, profCanvas
+    profBg = PhotoImage(file='profile-page.png')
 
     profCanvas = Canvas(topRoot, width=500, height=400)
     profCanvas.pack(fill=BOTH)
-    profCanvas.create_image(0, 0, image=profimg, anchor=NW)
-    profCanvas.create_image(53, 53, image=profImg, anchor=NW)
+    profCanvas.create_image(0, 0, image=profBg, anchor=NW)
+    profCanvas.create_image(53, 53, image=globalImg[4], anchor=NW)
 
     fonval = ('Josefin Sans', 27)
     profCanvas.create_text(60, 150, text=f'Hospital: {user}', font=fonval, fill='white', anchor=NW)
