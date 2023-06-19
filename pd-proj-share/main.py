@@ -3,7 +3,7 @@ from tkinter import *
 import mysql.connector as sql
 from re import findall
 import ctypes, os
-globpassw = 'root'
+MYSQL_PASSWORD = 'root'
 current_dir = os.path.dirname(__file__)
 
 def create_entry(control, varx, vary, text, *args, **kwargs):
@@ -14,6 +14,7 @@ def create_entry(control, varx, vary, text, *args, **kwargs):
 
 def create_button(control, text, varx, vary, **kwargs):
     button = Button(control, text=text, background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', **kwargs)
+    button.pack()
     button.place(x=varx, y=vary)
     return button
 
@@ -38,7 +39,8 @@ def init():
     ctypes.windll.gdi32.AddFontResourceA(os.path.join(current_dir, 'JosefinSans-Regular.ttf'))
 
     topRoot = Toplevel(root)
-    topRoot.withdraw()
+    topRoot.withdraw(); root.withdraw()
+    topRoot.resizable(False, False)
     topRoot.title('Profile')
     topRoot.geometry('500x400+270+200')
     topRoot.iconphoto(False, PhotoImage(file=os.path.join(current_dir, 'src/logo-nosh.png')))
@@ -47,7 +49,7 @@ def init():
 
     global con, cur
     try:
-        con = sql.connect(host='localhost', user='root', password=globpassw)
+        con = sql.connect(host='localhost', user='root', password=MYSQL_PASSWORD)
         cur = con.cursor()
     except:
         messagebox.showerror('Error', 'Failed to connect to SQL')
@@ -205,7 +207,7 @@ def pinVerify(pin) -> True:
     invalid = [29, 35, 54, 55, 65, 66]
     if pin[:2] in invalid:
         return False
-    reg = open('validrange.txt')
+    reg = open(os.path.join(current_dir, 'validrange.txt'))
     status = False
     for i in range(8):
         regx = reg.readline().strip().replace('/', '')
@@ -295,7 +297,7 @@ def showData():
 
 
 def DEL_EVENT(): 
-    topRoot.withdraw()
+    topRoot.withdraw(); root.destroy()
     profCanvas.destroy()
 
 def profile(user, hid, pin):
@@ -304,17 +306,47 @@ def profile(user, hid, pin):
     profBg = PhotoImage(file=os.path.join(current_dir, 'bg/profile-page.png'))
 
     profCanvas = Canvas(topRoot, width=500, height=400)
-    profCanvas.pack(fill=BOTH)
+    profCanvas.pack(fill=BOTH,)
     profCanvas.create_image(0, 0, image=profBg, anchor=NW)
     profCanvas.create_image(53, 53, image=globalImg[4], anchor=NW)
 
     fonval = ('Josefin Sans', 27)
-    profCanvas.create_text(60, 150, text=f'Hospital: {user}', font=fonval, fill='white', anchor=NW)
-    profCanvas.create_text(60, 200, text=f'Hospital ID: {hid}', font=fonval, fill='white', anchor=NW)
-    profCanvas.create_text(60, 250, text=f'Pin Code: {pin}', font=fonval, fill='white', anchor=NW)
+    Title = profCanvas.create_text(60, 90, text=f'{user.title()}', font=fonval+('bold',), fill='white', anchor=NW)
+    RegID = profCanvas.create_text(60, 130, text=f'Reg. ID: {hid}', font=fonval, fill='white', anchor=NW)
+    Pin = profCanvas.create_text(60, 170, text=f'Pin Code: {pin}', font=fonval, fill='white', anchor=NW)
+
+    editBtn = create_button(topRoot, 'Edit Pin Code', 60, 300, command= lambda: editProfile())
+    editBtn_leave = create_button(topRoot, 'Stop Editing', 60, 300, command= lambda: ep_1())
+    editBtn_save = create_button(topRoot, 'Save Pin Code', 180, 300, command= lambda: ep_2())
+    editBtn_leave.place(x=-100, y=-100)
+    editBtn_save.place(x=-100, y=-100)
+    global pinEntry
+    pinEntry = create_entry(topRoot, -200, -180, '')
+
+    def editProfile():
+        pinEntry.place(x=200, y=180)
+        editBtn.place(x=-100, y=-100)
+        editBtn_leave.place(x=60, y=300)
+        editBtn_save.place(x=180, y=300)
+    def ep_1():
+        editBtn.place(x=60, y=300)
+        editBtn_leave.place(x=-100, y=-100)
+        editBtn_save.place(x=-100, y=-100)
+        pinEntry.place(x=-100, y=-100)
+    def ep_2():
+        query = "update hospital set PinCode=%s where HospitalID=%s"
+        pinVal = pinEntry.get()
+        if pinVerify(pinVal) == True:
+            values = (pinVal, hid)
+            cur.execute(query, values)
+            con.commit()
+            pin = pinVal
+            profCanvas.itemconfigure(Pin, text=f'Pin Code: {pin}')
+        ep_1()
 
 if __name__ == '__main__':
     # Start program
     init()
     # program('lions', 'root', '123', '1235')
+    profile('lions', '123', '1234234')
     root.mainloop()
