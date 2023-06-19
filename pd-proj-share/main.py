@@ -348,5 +348,5 @@ if __name__ == '__main__':
     # Start program
     init()
     # program('lions', 'root', '123', '1235')
-    profile('lions', '123', '1234234')
+    # profile('lions', '123', '1234234')
     root.mainloop()
