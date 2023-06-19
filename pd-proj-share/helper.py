@@ -1,5 +1,5 @@
 import functions as f
-import main as m
+import __main__ as m
 
 from tkinter import Entry, Button, FLAT
 from re import findall

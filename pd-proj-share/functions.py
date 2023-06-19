@@ -5,7 +5,7 @@ import os, ctypes
 
 MYSQL_PASSWORD = 'root'
 current_dir = os.path.dirname(__file__)
-from main import loginSubm, SignSubm, DEL_EVENT
+import __main__ as m
 from helper import pinVerify, switchL_S, switchS_L, create_button, create_entry
 
 
@@ -44,7 +44,7 @@ def init():
     topRoot.geometry('500x400+270+200')
     topRoot.iconphoto(False, PhotoImage(file=os.path.join(current_dir, 'src/logo-nosh.png')))
 
-    topRoot.protocol('WM_DELETE_WINDOW', DEL_EVENT)
+    topRoot.protocol('WM_DELETE_WINDOW', m.DEL_EVENT)
 
     global con, cur
     try:
@@ -108,7 +108,7 @@ def SignUp():
     PassWord.bind('<FocusOut>', lambda event: restoreText(PassWord, 'Enter a Strong Password'))
 
     swchBtnSu = Button(root, command=switchS_L, image=arrow, relief=FLAT, bd=0, highlightthickness=0, activebackground='#ad1e1e')
-    submBtnSu = create_button(root, 'Submit', 425, 430, command= lambda: SignSubm(pinCode.get(), Contact.get(), hospName.get(), PassWord.get()))
+    submBtnSu = create_button(root, 'Submit', 425, 430, command= lambda: m.SignSubm(pinCode.get(), Contact.get(), hospName.get(), PassWord.get()))
 
     swchBtnSu.place(x=770, y=30)
 
@@ -140,7 +140,7 @@ def Login():
     userPass.bind('<FocusOut>', lambda event: restoreText(userPass, 'Password'))
     userPass.bind('<Return>',  lambda event: loginSubm(userName.get(), userPass.get()))
 
-    submBtnLi = create_button(root, 'Login', 353, 380, command= lambda: loginSubm(userName.get(), userPass.get()))
+    submBtnLi = create_button(root, 'Login', 353, 380, command= lambda: m.loginSubm(userName.get(), userPass.get()))
     signBtnLi = create_button(root, 'Sign Up', 485, 380, command=switchL_S)
    
     orLbl = canvasLi.create_text(440, 385, text='..OR..', anchor='nw', font=('Josefin Sans', 14), fill='white')
