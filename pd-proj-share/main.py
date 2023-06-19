@@ -39,7 +39,7 @@ def init():
     ctypes.windll.gdi32.AddFontResourceA(os.path.join(current_dir, 'JosefinSans-Regular.ttf'))
 
     topRoot = Toplevel(root)
-    topRoot.withdraw(); root.withdraw()
+    topRoot.withdraw();
     topRoot.resizable(False, False)
     topRoot.title('Profile')
     topRoot.geometry('500x400+270+200')
@@ -297,7 +297,7 @@ def showData():
 
 
 def DEL_EVENT(): 
-    topRoot.withdraw(); root.destroy()
+    topRoot.withdraw();
     profCanvas.destroy()
 
 def profile(user, hid, pin):
