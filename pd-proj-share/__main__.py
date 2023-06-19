@@ -8,6 +8,10 @@ current_dir = os.path.dirname(__file__)
 import functions as f
 import helper as h
 
+btnLooks = {
+    "bg":"#D22B2B", "relief":"flat", "activebackground":"#D22B2B"
+}
+
 def SignSubm(postCode, contact, hospName, passwrd):
     verf = h.pinVerify(postCode)
     if verf == False:
@@ -60,19 +64,13 @@ def program(u, p, i, pc):
     for x in ww:
         x.destroy()
     global img, title_bar, scrollbar
-    btnLooks = {
-        "bg":"#D22B2B", "relief":"flat", "activebackground":"#D22B2B"
-    }
         
     title_bar = Frame(f.root, bg="#D22B2B", height=30)
     title_bar.pack(fill=X)
     title_bar.place(rely=0.045, relwidth=1)
     img = [PhotoImage(file=os.path.join(f.current_dir, 'src/menu.png')), PhotoImage(file=os.path.join(f.current_dir, 'src/cog.png'))]
-    # home_bar = Frame(f.root, bg="#D22B2B", width=100)
-    # home_bar.pack(fill=Y)
-    # home_bar.place(relx=0.9, relheight=1) # relwidth gives the fill to be 100%, rely keeps it 500*0.05 = 25 pixels from top
 
-    menu_btn = Button(title_bar, image=img[0], **btnLooks, )
+    menu_btn = Button(title_bar, image=img[0], **btnLooks, command= lambda: menu())
     menu_btn.pack(side=LEFT)
     logo_lbl = Label(title_bar, bg="#D22B2B", image=f.globalImg[2])
     logo_lbl.pack(side=LEFT, padx=10)
@@ -82,10 +80,10 @@ def program(u, p, i, pc):
 
     profile_btn = Button(title_bar, image=f.globalImg[4], command= lambda: profile(u, i, pc), **btnLooks)
     profile_btn.place(x=830, y=0)
-    settings_btn = Button(title_bar, image=img[1], command= lambda: profile(u, i, pc), **btnLooks)
+    settings_btn = Button(title_bar, image=img[1], **btnLooks)
     settings_btn.place(x=880, y=0)
 
-    global storage
+    global storage, active
     storage = ["", 0]
     def scroll_text(txt):
         global storage
@@ -108,29 +106,71 @@ def program(u, p, i, pc):
     
     # a = Button(f.root, text= 'a', command= lambda: scroll_text('   nyooooooooom   '))
     # a.place(x=30, y=300)
-    # preview()
-    # profile(u, i, pc)
+    active = False
+    def menu():
+        global active, home_bar
+        if active == True:
+            home_bar.destroy()
+            active = False
+            return
+        else:
+            active = True
+        home_bar = Frame(f.root, bg="#D22B2B", highlightthickness=2, highlightbackground='black')
+        home_bar.pack(fill=Y)
+        home_bar.place(relx=0, rely=0.138, relheight=1, relwidth=0.25) # relwidth gives the fill to be 100%, rely keeps it 500*0.05 = 25 pixels from top
 
+        optionLooks = {
+            "padx": 10, "pady": 10, "font": ("Corbel", 15),
+            "fg": "white", "underline": 4,
+            "activeforeground":"white"
+        }
+        option_1 = Button(home_bar, text='⦿    Donate Blood', **btnLooks, **optionLooks, command= lambda: dntBld())
+        option_2 = Button(home_bar, text='⦿    Retrieve Blood',  **btnLooks, **optionLooks, command= lambda: retrBld())
+        option_3 = Button(home_bar, text='⦿    See Blood Bank',  **btnLooks, **optionLooks, command= lambda: bloodBnk())
+        option_1.place(x=20, y=30)
+        option_2.place(x=20, y=100)
+        option_3.place(x=20, y=170)
 
-def showData():
-    prev1 = Label(f.root, image=blob)
-    prev2 = Label(f.root, image=blob)
+        def dntBld():
+            global active
+            active = False
+            home_bar.destroy()
+            try: frame_bb.destroy()
+            except: pass
+            scroll_text('    Now Donating Blood    ')
 
-    prev1.place(x=20, y=200)
-    prev2.place(x=350, y=200)
-    table_data = [
-        ['O', '12', '+'],
-        ['O', '7', '-'],
-        ['A', '8', '+'],
-        ['A', '16', '-'],
-    ]
+        def retrBld():
+            global active
+            active = False
+            home_bar.destroy()
+            try: frame_bb.destroy()
+            except: pass
+            scroll_text('    Now Retrieving Blood    ')
 
-    # Create labels for table data
-    for row, data_row in enumerate(table_data, start=1):
-        for column, data in enumerate(data_row):
-            label = Label(f.root, text=data, relief=GROOVE, width=12)
-            label.grid(row=row, column=column)
-            label.place(x=20+column*100, y=100+row*30)
+        def bloodBnk():
+            scroll_text('    Now Managing Blood Database    ')
+
+            global active, frame_bb
+            frame_bb = Frame(f.root)
+            frame_bb.pack(fill=BOTH, expand=True)
+            frame_bb.place(rely=0.138)
+            
+            home_bar.destroy()
+            active = False
+
+            table_data = [
+                ['BloodType', 'Units', 'Rh'],
+                ['O', '12', '+'],
+                ['O', '7', '-'],
+                ['A', '8', '+'],
+                ['A', '16', '-'],
+            ]
+
+            for row, data_row in enumerate(table_data, start=1):
+                for column, data in enumerate(data_row):
+                    label = Label(frame_bb, text=data, relief=GROOVE, width=12)
+                    label.grid(row=row, column=column)
+                    # label.place(x=40 + column * 100, y=150 + row * 30)
 
 
 def profile(user, hid, pin):

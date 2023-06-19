@@ -35,10 +35,10 @@ def init():
     # Makes the images accessible globally -- as globalImg[n] n being item index
     globalImg = [bg_img_1, bg_img_2, logo_80, logo_120, profImg]
 
-    ctypes.windll.gdi32.AddFontResourceA(os.path.join(current_dir, 'JosefinSans-Regular.ttf'))
+    ctypes.windll.gdi32.AddFontResourceA(os.path.join(current_dir, 'src/JosefinSans-Regular.ttf'))
 
     topRoot = Toplevel(root)
-    topRoot.withdraw();
+    topRoot.withdraw(); 
     topRoot.resizable(False, False)
     topRoot.title('Profile')
     topRoot.geometry('500x400+270+200')
