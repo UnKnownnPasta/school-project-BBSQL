@@ -138,7 +138,7 @@ def Login():
     userPass = create_entry(root, 240, 320, 'Password', width=70)
     userPass.bind('<FocusIn>', lambda event: setText(userPass, 'Password'))
     userPass.bind('<FocusOut>', lambda event: restoreText(userPass, 'Password'))
-    userPass.bind('<Return>',  lambda event: loginSubm(userName.get(), userPass.get()))
+    userPass.bind('<Return>',  lambda event: m.loginSubm(userName.get(), userPass.get()))
 
     submBtnLi = create_button(root, 'Login', 353, 380, command= lambda: m.loginSubm(userName.get(), userPass.get()))
     signBtnLi = create_button(root, 'Sign Up', 485, 380, command=switchL_S)
