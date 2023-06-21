@@ -23,13 +23,13 @@ def pinVerify(pin) -> True:
     invalid = [29, 35, 54, 55, 65, 66]
     if pin[:2] in invalid:
         return False
-    reg = open(os.path.join(f.current_dir, 'validrange.txt'))
-    status = False
-    for i in range(8):
-        regx = reg.readline().strip().replace('/', '')
-        m = findall(regx, pin)
-        if len(m) != 0:
-            status = True
+    # reg = open(os.path.join(f.current_dir, 'validrange.txt'))
+    # status = False
+    # for i in range(8):
+    #     regx = reg.readline().strip().replace('/', '')
+    #     m = findall(regx, pin)
+    #     if len(m) != 0:
+    #         status = True
     return status
 
 
