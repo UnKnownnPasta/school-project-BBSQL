@@ -15,7 +15,7 @@ Update `MYSQL_PASSWORD` variable in `functions.py` to your sql password
 
 Clone the project
 ```bash
-  git clone https://github.com/UnKnownnPasta/school-project-BBSQL.git
+git clone https://github.com/UnKnownnPasta/school-project-BBSQL.git
 ```
 
 # Functionality [^1]
@@ -32,15 +32,17 @@ Admin/User independent pages
     - Detailed view of profile
 
 # 🖼 Gallery
-Login screen:
-![Login Screen](blob/s-1.png)
+### Login screen:
+![Login Screen](blob/ss-1.png)
 
-Sign up screen:
-![Sign up Screen](blob/s-2.png)
+### Sign up screen:
+![Sign up Screen](blob/ss-2.png)
 
-Admin Landing Page: [^2]
-![Main](blob/s-3.png)
+### Admin Landing Page: [^2]
+![Main](blob/ss-3.png)
 
+### Editing Profile:
+![Profile](blob/ss-4.png)
 
 
 
