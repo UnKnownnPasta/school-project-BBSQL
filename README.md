@@ -1,6 +1,6 @@
 # A tkinter project
 School project for a Blood Bank Management System, backed with functioning database system and features
-### THIS IS NOT A PUBLIC PACKAGE
+###### NOTE:    THIS IS NOT A PUBLIC PACKAGE
 
 # Dependencies 
 - Tkinter @ Python `3.11`
