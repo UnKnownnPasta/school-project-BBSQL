@@ -1,8 +1,7 @@
 /src
-its/pre-*
-prottp-0.py
-its/*
-!its/v1
+versions/*
+!versions/v1
+!versions/v2
 /.vscode/
 DEV
-*.zip
+__pycache__

@@ -1,7 +1,7 @@
 import functions as f
 import __main__ as m
 
-from tkinter import Entry, Button, FLAT
+from tkinter import Entry, Button, FLAT, Label
 from re import findall
 import os
 
@@ -15,6 +15,7 @@ import os
 #       - QOL Functions:
 #           create_entry() to create a Entry() with default params
 #           create_button() to create a Button() with default params
+#           osDirFetch() to get absolute os path using function modules os.<absolute_path> with join(<relative_path>)
 #
 
 def pinVerify(pin) -> True:
@@ -52,7 +53,15 @@ def create_entry(control, varx, vary, text, *args, **kwargs):
     return entry
 
 def create_button(control, text, varx, vary, **kwargs):
-    button = Button(control, text=text, background='#6CB4EE', relief=FLAT, padx=20, pady=10, activebackground='#6CB4EE', **kwargs)
+    abg = '#6CB4EE' if not kwargs.get('activebackground') else kwargs.get('activebackground')
+    bg = '#6CB4EE' if not kwargs.get('background') else kwargs.get('background')
+    px = 10 if not kwargs.get('padx') else kwargs.get('padx')
+    for i in ['activebackground', 'background', 'padx']:
+        kwargs.pop(i, None)
+    button = Button(control, text=text, background=bg, relief='flat', padx=px, pady=10, activebackground=abg, **kwargs)
     button.pack()
     button.place(x=varx, y=vary)
     return button
+
+def osDirFetch(path):
+    return os.path.join(f.current_dir, path)

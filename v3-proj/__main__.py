@@ -1,16 +1,22 @@
 from tkinter import messagebox
 from tkinter import *
 import mysql.connector as sql
-from re import findall
 import os
 
 current_dir = os.path.dirname(__file__)
 import functions as f
 import helper as h
 
-btnLooks = {
-    "bg":"#D22B2B", "relief":"flat", "activebackground":"#D22B2B"
-}
+
+#   TODO
+#       - btn on menu 
+#       - menu swap
+#       - settings
+#       - logout/login
+#       - profile sys
+#       - connect db each time a option is parked
+#       - polish
+#
 
 def SignSubm(postCode, contact, hospName, passwrd):
     verf = h.pinVerify(postCode)
@@ -68,9 +74,12 @@ def program(u, p, i, pc):
     title_bar = Frame(f.root, bg="#D22B2B", height=30)
     title_bar.pack(fill=X)
     title_bar.place(rely=0.045, relwidth=1)
-    img = [PhotoImage(file=os.path.join(f.current_dir, 'src/menu.png')), PhotoImage(file=os.path.join(f.current_dir, 'src/cog.png'))]
+    img = [PhotoImage(file=h.osDirFetch('src/menu.png')), PhotoImage(file=h.osDirFetch('src/cog.png'))]
 
-    menu_btn = Button(title_bar, image=img[0], **btnLooks, command= lambda: menu())
+    btnLooks = {
+        "bg":"#D22B2B", "relief":"flat", "activebackground":"#D22B2B"
+    }
+    menu_btn = Button(title_bar, image=img[0], text='menu', **btnLooks, command= lambda: menu())
     menu_btn.pack(side=LEFT)
     logo_lbl = Label(title_bar, bg="#D22B2B", image=f.globalImg[2])
     logo_lbl.pack(side=LEFT, padx=10)
@@ -78,105 +87,75 @@ def program(u, p, i, pc):
     title_label = Label(title_bar, text=u.title(), fg="white", bg="#D22B2B", font=('Josefin Sans', 17), pady=0)
     title_label.place(x=95, y=0)
 
-    profile_btn = Button(title_bar, image=f.globalImg[4], command= lambda: profile(u, i, pc), **btnLooks)
-    profile_btn.place(x=830, y=0)
-    settings_btn = Button(title_bar, image=img[1], **btnLooks)
-    settings_btn.place(x=880, y=0)
+    profile_btn = h.create_button(title_bar, '', 830, 0, bg='#d22b2b', activebackground='#d22b2b', image=f.globalImg[4], command= lambda: profile(u, i, pc))
+    settings_btn = h.create_button(title_bar, '', 880, 0, bg='#d22b2b', activebackground='#d22b2b', image=img[1])
 
-    global storage, active
-    storage = ["", 0]
-    def scroll_text(txt):
-        global storage
-        storage[0] += txt
-        scrollbar.configure(text=storage[0])
+    global active
 
-        def rotate(): # Text Capacity = 187 + word length
-            text = scrollbar.cget("text")
-            if len(text) >= 187+len(storage[0]):
-                storage[0] = ""
-            scrollbar.config(text=text + "  ")
-            scrollbar.after(100, rotate)
-
-        if not storage[1]:
-            storage[1] = 1; rotate()
-
-    scrollbar = Label(f.root, font=("Arial", 12), anchor=NE, bg="black", fg="white", width=104)
-    scrollbar.place(x=0, y=0)
-    scroll_text(f'   Welcome {u.title()}!   ')
+    f.scroll_text(f'   Welcome {u.title()}!   ')
     
-    # a = Button(f.root, text= 'a', command= lambda: scroll_text('   nyooooooooom   '))
-    # a.place(x=30, y=300)
     active = False
     def menu():
         global active, home_bar
         if active == True:
             home_bar.destroy()
-            active = False
-            return
-        else:
-            active = True
+            active = False; return
+        else: active = True
+
         home_bar = Frame(f.root, bg="#D22B2B", highlightthickness=2, highlightbackground='black')
         home_bar.pack(fill=Y)
         home_bar.place(relx=0, rely=0.138, relheight=1, relwidth=0.25) # relwidth gives the fill to be 100%, rely keeps it 500*0.05 = 25 pixels from top
 
         optionLooks = {
-            "padx": 10, "pady": 10, "font": ("Corbel", 15),
+            "font": ("Corbel", 15), "padx":10,
             "fg": "white", "underline": 4,
-            "activeforeground":"white"
+            "activeforeground":"white",
+            "background":"#D22B2B", "activebackground":"#D22B2B"
         }
-        option_1 = Button(home_bar, text='⦿    Donate Blood', **btnLooks, **optionLooks, command= lambda: dntBld())
-        option_2 = Button(home_bar, text='⦿    Retrieve Blood',  **btnLooks, **optionLooks, command= lambda: retrBld())
-        option_3 = Button(home_bar, text='⦿    See Blood Bank',  **btnLooks, **optionLooks, command= lambda: bloodBnk())
-        option_1.place(x=20, y=30)
-        option_2.place(x=20, y=100)
-        option_3.place(x=20, y=170)
+        option_1 = h.create_button(home_bar, '⦿    Donate Blood', 20, 30, **optionLooks, command= lambda: dntBld())
+        option_2 = h.create_button(home_bar, '⦿    Retrieve Blood', 20, 100, **optionLooks, command= lambda: retrBld())
+        option_3 = h.create_button(home_bar, '⦿    See Blood Bank', 20, 170, **optionLooks, command= lambda: bloodBnk())
 
-        def dntBld():
+        def dropFrame(txt):
             global active
-            active = False
-            home_bar.destroy()
+            active = False; home_bar.destroy() # Make
+            f.scroll_text(txt)
             try: frame_bb.destroy()
             except: pass
-            scroll_text('    Now Donating Blood    ')
 
-        def retrBld():
-            global active
-            active = False
-            home_bar.destroy()
-            try: frame_bb.destroy()
-            except: pass
-            scroll_text('    Now Retrieving Blood    ')
+        def dntBld(): dropFrame('    Now Donating Blood    ')
+        def retrBld(): dropFrame('    Now Retrieving Blood    ')
 
         def bloodBnk():
-            scroll_text('    Now Managing Blood Database    ')
+            dropFrame('    Now Managing Blood Database    ')
 
-            global active, frame_bb
-            frame_bb = Frame(f.root)
-            frame_bb.pack(fill=BOTH, expand=True)
-            frame_bb.place(rely=0.138)
+        #     global active, frame_bb
+        #     frame_bb = Frame(f.root)
+        #     frame_bb.pack(fill=BOTH, expand=True)
+        #     frame_bb.place(rely=0.138)
             
-            home_bar.destroy()
-            active = False
+        #     home_bar.destroy()
+        #     active = False
 
-            table_data = [
-                ['BloodType', 'Units', 'Rh'],
-                ['O', '12', '+'],
-                ['O', '7', '-'],
-                ['A', '8', '+'],
-                ['A', '16', '-'],
-            ]
+        #     table_data = [
+        #         ['BloodType', 'Units', 'Rh'],
+        #         ['O', '12', '+'],
+        #         ['O', '7', '-'],
+        #         ['A', '8', '+'],
+        #         ['A', '16', '-'],
+        #     ]
 
-            for row, data_row in enumerate(table_data, start=1):
-                for column, data in enumerate(data_row):
-                    label = Label(frame_bb, text=data, relief=GROOVE, width=12)
-                    label.grid(row=row, column=column)
-                    # label.place(x=40 + column * 100, y=150 + row * 30)
+        #     for row, data_row in enumerate(table_data, start=1):
+        #         for column, data in enumerate(data_row):
+        #             label = Label(frame_bb, text=data, relief=GROOVE, width=12)
+        #             label.grid(row=row, column=column)
+        #             # label.place(x=40 + column * 100, y=150 + row * 30)
 
 
 def profile(user, hid, pin):
     f.topRoot.deiconify()
     global profBg, profCanvas
-    profBg = PhotoImage(file=os.path.join(f.current_dir, 'bg/profile-page.png'))
+    profBg = PhotoImage(file=h.osDirFetch('bg/profile-page.png'))
 
     profCanvas = Canvas(f.topRoot, width=500, height=400)
     profCanvas.pack(fill=BOTH,)
@@ -184,16 +163,16 @@ def profile(user, hid, pin):
     profCanvas.create_image(53, 53, image=f.globalImg[4], anchor=NW)
 
     fonval = ('Josefin Sans', 27)
-    Title = profCanvas.create_text(60, 90, text=f'{user.title()}', font=fonval+('bold',), fill='white', anchor=NW)
-    RegID = profCanvas.create_text(60, 130, text=f'Reg. ID: {hid}', font=fonval, fill='white', anchor=NW)
-    Pin = profCanvas.create_text(60, 170, text=f'Pin Code: {pin}', font=fonval, fill='white', anchor=NW)
+    profCanvas.create_text(60, 90, text=f'{user.title()}', font=fonval+('bold',), fill='white', anchor=NW)
+    profCanvas.create_text(60, 130, text=f'Reg. ID: ' + f'{hid}'.zfill(4), font=fonval, fill='white', anchor=NW)
+    profCanvas.create_text(60, 170, text=f'Pin Code: {pin}', font=fonval, fill='white', anchor=NW)
 
     editBtn = h.create_button(f.topRoot, 'Edit Pin Code', 60, 300, command= lambda: editProfile())
     editBtn_leave = h.create_button(f.topRoot, 'Stop Editing', 60, 300, command= lambda: ep_1())
     editBtn_save = h.create_button(f.topRoot, 'Save Pin Code', 180, 300, command= lambda: ep_2())
     
     negCoord = {"x":-100, "y":-100} # Out of plane
-    editBtn_leave.place(**negCoord)
+    editBtn_leave.place(**negCoord) # This places it out of view
     editBtn_save.place(**negCoord)
     global pinEntry
     pinEntry = h.create_entry(f.topRoot, -200, -180, '')
@@ -225,4 +204,5 @@ def profile(user, hid, pin):
 if __name__ == '__main__':
     # Start program
     f.init()
+    # program('abc', 'abc', '234', '4534534')
     f.root.mainloop()

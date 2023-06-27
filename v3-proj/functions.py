@@ -5,8 +5,8 @@ import os, ctypes
 
 MYSQL_PASSWORD = 'root'
 current_dir = os.path.dirname(__file__)
-import __main__ as m
 from helper import pinVerify, switchL_S, switchS_L, create_button, create_entry
+import __main__ as m
 
 
 #
@@ -17,10 +17,9 @@ from helper import pinVerify, switchL_S, switchS_L, create_button, create_entry
 #       - Login() for login window
 #
 
-
+root = Tk()
 def init():
-    global arrow, root, blob, topRoot, globalImg
-    root = Tk()
+    global arrow, root, blob, topRoot, globalImg, root
 
     # Defined here since it wouldn't load otherwise
     bg_img_1 = PhotoImage(file=os.path.join(current_dir, 'bg/bg-blur-v2.png'))
@@ -144,3 +143,26 @@ def Login():
     signBtnLi = create_button(root, 'Sign Up', 485, 380, command=switchL_S)
    
     orLbl = canvasLi.create_text(440, 385, text='..OR..', anchor='nw', font=('Josefin Sans', 14), fill='white')
+
+
+global storage
+storage = ["", 0]
+scrollbar = Label(root, font=("Arial", 12), anchor=NE, bg="black", fg="white", width=104)
+
+scrollbar.place(x=0, y=0)
+def scroll_text(txt):
+    global storage
+    storage[0] += txt
+    if len(storage[0]) > 140:
+        storage[0] = '  '.join(storage[0].split('  ')[7:])
+    scrollbar.configure(text=storage[0])
+
+    def rotate(): # Text Capacity = 187 + word length
+        text = scrollbar.cget("text")
+        if len(text) >= 187+len(storage[0]):
+            storage[0] = ""
+        scrollbar.config(text=text + "  ")
+        scrollbar.after(100, rotate)
+
+    if not storage[1]:
+        storage[1] = 1; rotate()
