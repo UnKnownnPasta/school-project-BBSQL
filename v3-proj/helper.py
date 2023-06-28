@@ -1,22 +1,5 @@
-import functions as f
-import __main__ as m
-
-from tkinter import Entry, Button, FLAT, Label
-from re import findall
-import os
-
-#
-#   This module stores helper functions such as
-#       - pinVerify() to verify if the entered pin is a valid one
-#           * used in SignUp()
-#           * used in profile editing
-#       - functions to switch from login to sign up and vis. a vis.
-#       
-#       - QOL Functions:
-#           create_entry() to create a Entry() with default params
-#           create_button() to create a Button() with default params
-#           osDirFetch() to get absolute os path using function modules os.<absolute_path> with join(<relative_path>)
-#
+from __main__ import app
+from tkinter import Entry, Button, Label
 
 def pinVerify(pin) -> True:
     if not pin.isdigit() or pin[0] == '0' or len(pin) != 6:
@@ -27,20 +10,25 @@ def pinVerify(pin) -> True:
     return status
 
 
-def switchS_L(): # Signup to Login
-    w = [f.hospName, f.pinCode, f.Contact, f.submBtnSu, f.canvasSu, f.swchBtnSu, f.PassWord]
-    for i in w:
-        i.destroy()
-    f.Login()
-def switchL_S(): # Login to Signup
-    w = [f.canvasLi, f.userName, f.userPass, f.submBtnLi, f.signBtnLi]
-    for i in w:
-        i.destroy()
-    f.SignUp()
+def switchS_L():
+    from authenticate import Login
+
+    for widget in app.signup_var:
+        widget.destroy()
+    data = Login()
+    app.login_var = [data.login_canvas, data.signin_button, data.submit_button, data.user_name, data.user_pass]
+
+def switchL_S():
+    from authenticate import SignUp
+
+    for widget in app.login_var:
+        widget.destroy()
+    data = SignUp()
+    app.signup_var = [data.signup_canvas, data.Contact, data.hospName, data.PassWord, data.pinCode, data.submBtnSu, data.swchBtnSu]
 
 
 def create_entry(control, varx, vary, text, *args, **kwargs):
-    entry = Entry(control, args,  bd=16, relief=FLAT, **kwargs)
+    entry = Entry(control, args,  bd=16, relief="flat", **kwargs)
     entry.place(x=varx, y=vary)
     entry.insert(0, text)
     return entry
@@ -48,13 +36,9 @@ def create_entry(control, varx, vary, text, *args, **kwargs):
 def create_button(control, text, varx, vary, **kwargs):
     abg = '#6CB4EE' if not kwargs.get('activebackground') else kwargs.get('activebackground')
     bg = '#6CB4EE' if not kwargs.get('background') else kwargs.get('background')
-    px = 10 if not kwargs.get('padx') else kwargs.get('padx')
-    for i in ['activebackground', 'background', 'padx']:
+    for i in ['activebackground', 'background']:
         kwargs.pop(i, None)
-    button = Button(control, text=text, background=bg, relief='flat', padx=px, pady=10, activebackground=abg, **kwargs)
+    button = Button(control, text=text, background=bg, relief="flat", padx=40, pady=10, activebackground=abg, **kwargs)
     button.pack()
     button.place(x=varx, y=vary)
     return button
-
-def osDirFetch(path):
-    return os.path.join(f.current_dir, path)
