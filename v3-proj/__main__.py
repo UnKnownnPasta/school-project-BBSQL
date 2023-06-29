@@ -44,7 +44,7 @@ class BloodBankApp:
             self.connection = sql.connect(host='localhost', user='root', password=MYSQL_PASSWORD)
             self.cursor = self.connection.cursor()
         except:
-            messagebox.showerror('Error', 'Failed to connect to SQL')
+            messagebox.showerror('Info', 'Failed to connect to SQL. Login will fail')
         else: # Runs if there is no error
             self.cursor.execute('show databases;')
 
@@ -55,12 +55,12 @@ class BloodBankApp:
             self.cursor.execute('use bloodbank')
 
         try:
-            with open(pathLoad('v3-proj/commands.sql'), 'r') as sql_file:
+            with open(pathLoad('commands.sql'), 'r') as sql_file:
                 sql_command = sql_file.readlines()
                 for command in sql_command:
                     self.cursor.execute(command)
         except:
-            messagebox.showerror('Error', 'Something went wrong while initializing tables.')
+            messagebox.showerror('Error', 'Failed to initialize tables.')
         finally:
             self.connection.commit()
 
@@ -86,6 +86,10 @@ class BloodBankApp:
         }
     
     def auth(self):
+        from authenticate import SelectAuthType
+        SelectAuthType()
+
+    def doLogin(self):
         from authenticate import Login
         login = Login() # Show login Page
 

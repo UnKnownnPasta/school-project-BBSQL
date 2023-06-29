@@ -24,7 +24,7 @@ def switchL_S():
     for widget in app.login_var:
         widget.destroy()
     data = SignUp()
-    app.signup_var = [data.signup_canvas, data.Contact, data.hospName, data.PassWord, data.pinCode, data.submBtnSu, data.swchBtnSu]
+    app.signup_var = [data.signup_canvas, data.Contact, data.hospName, data.PassWord, data.pinCode, data.submitBtn, data.switchBtn]
 
 
 def create_entry(control, varx, vary, text, *args, **kwargs):
