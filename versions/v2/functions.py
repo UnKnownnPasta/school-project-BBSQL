@@ -10,6 +10,7 @@ import __main__ as m
 
 
 #
+# os\.path\.join\(current_dir, '(.*?)'\)
 #   This module stores all the functions to start the program
 #
 #       - init() to initialize tkinter

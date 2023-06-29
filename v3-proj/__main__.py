@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, font, ttk
 import mysql.connector as sql
 import os, ctypes
 
@@ -11,6 +11,8 @@ current_dir = os.path.dirname(__file__)
 def pathLoad(path):
     return os.path.join(current_dir, path)
 
+
+
 class BloodBankApp:
 
     # __init__ starts the function - it's like calling a function with the stuff defined below, but automatic
@@ -21,9 +23,10 @@ class BloodBankApp:
         self.root.title('Blood Bank Mng')
         self.root.iconphoto(False, PhotoImage(file=pathLoad('src/logo-nosh.png')))
         self.root.resizable(False, False)
-        self.root.geometry(f"{940}x{500}+{(self.root.winfo_screenwidth() - 940) // 2}+{(self.root.winfo_screenheight() - 500) // 2}")
-
-        gdi32 = ctypes.WinDLL('gdi32')          # Install necessary font(s)
+        window_xCoord, window_yCoord = (self.root.winfo_screenwidth() - 940) // 2, (self.root.winfo_screenheight() - 500) // 2
+        self.root.geometry(f"{940}x{500}+{window_xCoord}+{window_yCoord}")
+        
+        gdi32 = ctypes.WinDLL('gdi32')          # Install necessary font(s) to windows
         gdi32.AddFontResourceW.argtypes = (ctypes.c_wchar_p,)
         gdi32.AddFontResourceW(pathLoad('src/JosefinSans-Regular.ttf'))
 
@@ -52,21 +55,21 @@ class BloodBankApp:
             self.cursor.execute('use bloodbank')
 
         try:
-            self.cursor.execute('create table if not exists Hospital (HospitalID int(4) auto_increment primary key, HospitalName varchar(100) unique, Password varchar(20), Contact varchar(100), PinCode char(6) not null)')   #.zfill
-            self.cursor.execute('create table if not exists BloodBank (BloodType char(2), Units int not null, RhFactor char(8))')
-            self.cursor.execute('create table if not exists Donor (Name varchar(40), Age int(3), Gender char(20), BloodGroup char(2), HospitalID int(4), foreign key (HospitalID) references Hospital(HospitalID))')
-            self.cursor.execute('create table if not exists Recipient (Name varchar(40), Age int(3), DateOfTransfer date, HospitalID int(4), BloodType char(2), foreign key (HospitalID) references Hospital(HospitalID))')
+            with open(pathLoad('v3-proj/commands.sql'), 'r') as sql_file:
+                sql_command = sql_file.readlines()
+                for command in sql_command:
+                    self.cursor.execute(command)
         except:
             messagebox.showerror('Error', 'Something went wrong while initializing tables.')
         finally:
             self.connection.commit()
 
     def initializeImages(self):
-        global arrow, blob, globalImages
+        global globalImages
         # Defining a bunch of images to preload so that it loads instantly
         
-        self.arrow = PhotoImage(file=pathLoad('src/arrow.png'))
-        self.blob = PhotoImage(file=pathLoad('src/box.png'))
+        arrow = PhotoImage(file=pathLoad('src/arrow.png'))
+        blob = PhotoImage(file=pathLoad('src/box.png'))
         
         bg_image_1 = PhotoImage(file=pathLoad('bg/bg-blur-v2.png'))
         bg_image_2 = PhotoImage(file=pathLoad('bg/bg-unblur.png'))    # If PIL was there, we can save file space by resizing images instead of loading new ones
@@ -75,7 +78,12 @@ class BloodBankApp:
         profileImage = PhotoImage(file=pathLoad('src/profile.png'))
 
         # Makes the images accessible globally -- called as globalImg[n], n being item index
-        globalImages = [bg_image_1, bg_image_2, logo_80, logo_120, profileImage]
+        globalImages = {
+            0: bg_image_1,    1: bg_image_2,
+            2: logo_80,       3: logo_120,
+            4: profileImage,  5: arrow,
+            6: blob
+        }
     
     def auth(self):
         from authenticate import Login

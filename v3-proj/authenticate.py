@@ -35,8 +35,6 @@ class Login:
 
         self.submit_button = create_button(root, 'Login', 320, 380, command= lambda: m.loginSubm(user_name.get(), user_pass.get()))
         self.signin_button = create_button(root, 'Sign Up', 460, 380, command=switchL_S)
-    
-        # or_label = self.login_canvas.create_text(422, 380, text='<----->', font=('Josefin Sans', 14), **standard_look)
 
 
 class SignUp:
@@ -71,7 +69,7 @@ class SignUp:
         self.PassWord.bind('<FocusIn>', lambda event: setText(self.PassWord, 'Enter a Strong self.Password'))
         self.PassWord.bind('<FocusOut>', lambda event: restoreText(self.PassWord, 'Enter a Strong self.Password'))
 
-        self.swchBtnSu = Button(root, command=switchS_L, image=app.arrow, relief=FLAT, bd=0, highlightthickness=0, activebackground='#ad1e1e')
+        self.swchBtnSu = Button(root, command=switchS_L, image=globalImages[5], relief=FLAT, bd=0, highlightthickness=0, activebackground='#ad1e1e')
         self.submBtnSu = create_button(root, 'Submit', 390, 430, command= lambda: m.SignSubm(self.pinCode.get(), self.Contact.get(), self.hospName.get(), self.PassWord.get()))
 
         self.swchBtnSu.place(x=770, y=30)
