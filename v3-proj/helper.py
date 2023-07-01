@@ -11,19 +11,19 @@ def pinVerify(pin) -> True:
 
 
 def switchS_L():
-    from authenticate import Login
+    from authenticate import AdminLogin
 
     for widget in app.signup_var:
         widget.destroy()
-    data = Login()
+    data = AdminLogin()
     app.login_var = [data.login_canvas, data.signin_button, data.submit_button, data.user_name, data.user_pass]
 
 def switchL_S():
-    from authenticate import SignUp
+    from authenticate import AdminSignUp
 
     for widget in app.login_var:
         widget.destroy()
-    data = SignUp()
+    data = AdminSignUp()
     app.signup_var = [data.signup_canvas, data.Contact, data.hospName, data.PassWord, data.pinCode, data.submitBtn, data.switchBtn]
 
 

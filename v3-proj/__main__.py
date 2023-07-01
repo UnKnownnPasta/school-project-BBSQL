@@ -90,8 +90,8 @@ class BloodBankApp:
         SelectAuthType()
 
     def doLogin(self):
-        from authenticate import Login
-        login = Login() # Show login Page
+        from authenticate import AdminLogin
+        login = AdminLogin() # Show login Page
 
         # Initialize a variable with all login page widgets for future usage
         self.login_var = [login.login_canvas, login.signin_button, login.submit_button, login.user_name, login.user_pass]
@@ -101,5 +101,5 @@ if __name__ == "__main__":
     app = BloodBankApp()
 
     # Run login page
-    app.auth()
+    app.doLogin()
     app.root.mainloop()
