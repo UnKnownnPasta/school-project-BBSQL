@@ -76,13 +76,14 @@ class BloodBankApp:
         logo_80 = PhotoImage(file=pathLoad('src/logo-80.png'))        # ImageTk.PhotoImage(logo_img.resize([int(0.13 * s) for s in logo_img.size]))
         logo_120 = PhotoImage(file=pathLoad('src/logo-120.png'))      # ImageTk.PhotoImage(logo_img.resize([int(0.25 * s) for s in logo_img.size]))
         profileImage = PhotoImage(file=pathLoad('src/profile.png'))
+        bg_image_3 = PhotoImage(file=pathLoad('bg/bg-auth.png'))
 
         # Makes the images accessible globally -- called as globalImg[n], n being item index
         globalImages = {
             0: bg_image_1,    1: bg_image_2,
             2: logo_80,       3: logo_120,
             4: profileImage,  5: arrow,
-            6: blob
+            6: blob,          7: bg_image_3
         }
     
     def authenticate(self):
@@ -94,12 +95,18 @@ class BloodBankApp:
         login = AdminLogin() # Show login Page
 
         # Initialize a variable with all login page widgets for future usage
-        self.login_var = [login.login_canvas, login.signin_button, login.submit_button, login.user_name, login.user_pass]
+        self.login_var = list(login.__dict__.values())
 
+    def doSignup(self):
+        from authenticate import AdminSignUp
+        signup = AdminSignUp()
+
+        # Initialize a variable with all login page widgets for future usage
+        self.signup_var = list(signup.__dict__.values())
 
 if __name__ == "__main__":
     app = BloodBankApp()
 
     # Run login page
-    app.doLogin()
+    app.authenticate()
     app.root.mainloop()

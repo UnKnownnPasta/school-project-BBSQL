@@ -5,25 +5,77 @@ from helper import *
 
 root, con, cur = app.root, app.connection, app.cursor
 
+
+# ----------------------------- Define text for the disappear-reappear effect -----------------------------
+
+def setText(entry, defaultText):
+    entry.delete(0, END) if entry.get().strip() == defaultText else None
+
+def restoreText(entry, defaultText):
+    entry.insert(0, defaultText) if entry.get().strip() == "" else None
+
+
+# ------------------------------ Main Classes for welcome/login/signup pages ------------------------------
 class SelectAuthType:
     def __init__(self):
         self.auth_canvas = Canvas(root, width='940', height='500', highlightthickness=0)
-        self.auth_canvas.create_image(0, 0, image=globalImages[1], anchor='nw')
+        self.auth_canvas.create_image(0, 0, image=globalImages[7], anchor='nw')
         self.auth_canvas.pack(side = "top", fill = "both", expand = True)
 
-        standard_look = {"anchor": "nw", "fill":"white"}
-        # self.login_choice = create_button(root, "Login as a User", 375, 260, comman=app.doLogin)
-        # self.signup_choice = create_button(root, 'Login as Administrator', 360, 350, command=app.doLogin)
+        self.count = 0
+        self.mainPage()
+    
+    def mainPage(self):
+        standard_look = {"anchor": "nw", "fill":"#D22B2B"}
 
-        self.auth_canvas.create_text(330, 100, text='Choose a Login', font=('Josefin Sans', 25), **standard_look)
+        self.auth_canvas.create_text(377, 85, text='Welcome!!', font=('Hello Sunday', 56), anchor=NW, fill='#303030')
+        self.auth_canvas.create_text(380, 85, text='Welcome!!', font=('Hello Sunday', 55), **standard_look)
+        self.auth_canvas.create_image(290, 70, image=globalImages[3], anchor='nw')
 
+        # Placeholder text for errors
+        self.errorText = self.auth_canvas.create_text(250, 200, text='', font=('Josefin Sans', 16), fill='', anchor=NW)
+
+        self.hospital_name = create_entry(root, 240, 240, 'Hospital Name', width=70)
+        self.hospital_name.bind('<FocusIn>', lambda event: setText(self.hospital_name, 'Hospital Name'))
+        self.hospital_name.bind('<FocusOut>', lambda event: restoreText(self.hospital_name, 'Hospital Name'))
+
+        self.user_name = create_entry(root, 240, 300, 'Your Name', width=70)
+        self.user_name.bind('<FocusIn>', lambda event: setText(self.user_name, 'Your Name'))
+        self.user_name.bind('<FocusOut>', lambda event: restoreText(self.user_name, 'Your Name'))
+
+        submit = create_button(root, 'Login', 405, 360, command= lambda: self.validate(self.hospital_name.get(), self.user_name.get()))
+
+    def displayError(self):
+        self.count += 1
+        self.auth_canvas.itemconfigure(self.errorText, fill='white')
+        self.auth_canvas.itemconfigure(self.errorText, text=f'Invalid Login Details. Check it again. [{self.count}]')
+
+    def validate(self, hn, un):
+        for i in [hn, un]:
+            print('/' + i + '/')
+            if len(i.strip()) == 0 or i in ['Hospital Name', 'Your Name']:
+                self.displayError()
+                return
+            elif i.isdigit():
+                self.displayError()
+                return
+        
+        for name, widget in self.__dict__.items():
+            if not isinstance(widget, int):
+                widget.destroy()
+
+        # Proceed to admin login *for now*
+        app.doLogin()
+        
 
 class AdminLogin:
     def __init__(self):
         self.login_canvas = Canvas(root, width='940', height='500', highlightthickness=0)
         self.login_canvas.create_image(0, 0, image=globalImages[1], anchor='nw')
         self.login_canvas.pack(side = "top", fill = "both", expand = True)
+        self.mainPage()
 
+    def mainPage(self):
         standard_look = {"anchor": "nw", "fill":"white"}
         titleLabel1 = self.login_canvas.create_text(355, 58, text='ADMIN', font=('Franklin Gothic', 25, 'bold'), **standard_look)
         titleLabel2 = self.login_canvas.create_text(470, 46, text='Login', font=('Josefin Sans', 25), **standard_look)
@@ -31,23 +83,17 @@ class AdminLogin:
         topText = self.login_canvas.create_text(240, 180, text='Sign In', font=('Franklin Gothic', 16, 'bold'), **standard_look)
         altText = self.login_canvas.create_text(240, 200, text='Fill in details to gain access', font=('Josefin Sans', 14), **standard_look)
 
-        def setText(entry, defaultText):
-            entry.delete(0, END) if entry.get().strip() == defaultText else None
-
-        def restoreText(entry, defaultText):
-            entry.insert(0, defaultText) if entry.get().strip() == "" else None
-
         self.user_name = create_entry(root, 240, 260, 'User Name', width=70)
         self.user_name.bind('<FocusIn>', lambda event: setText(self.user_name, 'User Name'))
         self.user_name.bind('<FocusOut>', lambda event: restoreText(self.user_name, 'User Name'))
 
-        self.user_pass = create_entry(root, 240, 315, 'Password', width=70)
+        self.user_pass = create_entry(root, 240, 320, 'Password', width=70)
         self.user_pass.bind('<FocusIn>', lambda event: setText(self.user_pass, 'Password'))
         self.user_pass.bind('<FocusOut>', lambda event: restoreText(self.user_pass, 'Password'))
         self.user_pass.bind('<Return>',  lambda event: m.loginSubm(self.user_name.get(), self.user_pass.get()))
 
-        self.submit_button = create_button(root, 'Login', 295, 380, command= lambda: m.loginSubm(self.user_name.get(), self.user_pass.get()))
-        self.signin_button = create_button(root, 'Make a account', 450, 380, command=switchL_S)
+        self.submit_button = create_button(root, 'Login', 300, 380, command= lambda: m.loginSubm(self.user_name.get(), self.user_pass.get()))
+        self.signin_button = create_button(root, 'Make a account', 428, 380, command=switchL_S)
 
 
 class AdminSignUp:
@@ -55,16 +101,12 @@ class AdminSignUp:
         self.signup_canvas  = Canvas(root, width='940', height='500', highlightthickness=0)
         self.signup_canvas .create_image(0, 0, image=globalImages[0], anchor='nw')
         self.signup_canvas .pack(side = "top", fill = "both", expand = True)
+        self.mainPage()
 
+    def mainPage(self):
         titleText = self.signup_canvas .create_text(240, 180, text='Enter Details to Create A Account..', anchor=NW, font=('Josefin Sans', 17), fill='white')
         altText = self.signup_canvas .create_text(320, 48, text='BLOOD BANK MANAGEMENT', anchor=NW, font=('Josefin Sans', 20, 'bold'), fill='white')
         self.signup_canvas .create_image(230, 30, image=globalImages[3], anchor=NW)
-
-        def setText(entry, defText):
-            entry.delete(0, END) if entry.get().strip() == defText else None
-            
-        def restoreText(entry, defText):
-            entry.insert(0, defText) if entry.get().strip() == "" else None
 
         self.hospName = create_entry(root, 240, 250, 'Hospital Name', width=70)
         self.hospName.bind('<FocusIn>', lambda event: setText(self.hospName, 'Hospital Name'))

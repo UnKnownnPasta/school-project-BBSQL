@@ -38,10 +38,10 @@ def create_entry(control, varx, vary, text, *args, **kwargs):
     return entry
 
 def create_button(control, text, varx, vary, **kwargs):
-    kwargs['activebackground'] = '#FF5733'
-    kwargs['background'] = '#EE4B2B'       # Update background to correct color if it's not mentioned already
+    if 'activebackground' not in kwargs: kwargs['activebackground'] = '#FF5733'
+    if 'background' not in kwargs: kwargs['background'] = '#EE4B2B'      # Add bg color if it's not mentioned
 
-    button = Button(control, text=text, relief="flat", padx=45, pady=15, bd=0, **kwargs)
+    button = Button(control, text=text, relief="flat", padx=35, pady=10, font=('Century Gothic', 11), bd=0, **kwargs)
     button.pack()
     button.place(x=varx, y=vary)
     return button
@@ -65,6 +65,7 @@ def AdminSubmit(postCode, contact, hospName, passwrd):
         messagebox.showerror('Failed', 'No Valid Contacts provided.')
         return
         
+    passwrd = passwrd.replace(' ', '_')
     try:
         vals = (hospName, passwrd, contact, postCode)
         query = "insert into Hospital (HospitalName, Password, Contact, PinCode) values (%s, %s, %s, %s)"
@@ -88,7 +89,7 @@ def AdminAccess(un, pw):
             return
 
     query = "select * from hospital where HospitalName=%s and Password=%s"
-    values = (un, pw)
+    values = (un, pw.replace(' ', '_'))
 
     f.cur.execute(query, values)
     res = f.cur.fetchone()
