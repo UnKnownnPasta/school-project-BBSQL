@@ -38,10 +38,10 @@ def create_entry(control, varx, vary, text, *args, **kwargs):
     return entry
 
 def create_button(control, text, varx, vary, **kwargs):
-    kwargs['activebackground'] = '#6CB4EE'
-    kwargs['background'] = '#6CB4EE'       # Update background to correct color if it's not mentioned already
+    kwargs['activebackground'] = '#FF5733'
+    kwargs['background'] = '#EE4B2B'       # Update background to correct color if it's not mentioned already
 
-    button = Button(control, text=text, relief="flat", padx=40, pady=10, **kwargs)
+    button = Button(control, text=text, relief="flat", padx=45, pady=15, bd=0, **kwargs)
     button.pack()
     button.place(x=varx, y=vary)
     return button

@@ -12,8 +12,10 @@ class SelectAuthType:
         self.auth_canvas.pack(side = "top", fill = "both", expand = True)
 
         standard_look = {"anchor": "nw", "fill":"white"}
-        self.login_choice = create_button(root, 'Login to Account', 100, 100, comman=app.doLogin)
-        self.signup_choice = create_button(root, 'Create A Account', 100, 100, comman=app.doLogin)
+        # self.login_choice = create_button(root, "Login as a User", 375, 260, comman=app.doLogin)
+        # self.signup_choice = create_button(root, 'Login as Administrator', 360, 350, command=app.doLogin)
+
+        self.auth_canvas.create_text(330, 100, text='Choose a Login', font=('Josefin Sans', 25), **standard_look)
 
 
 class AdminLogin:
@@ -39,13 +41,13 @@ class AdminLogin:
         self.user_name.bind('<FocusIn>', lambda event: setText(self.user_name, 'User Name'))
         self.user_name.bind('<FocusOut>', lambda event: restoreText(self.user_name, 'User Name'))
 
-        self.user_pass = create_entry(root, 240, 320, 'Password', width=70)
+        self.user_pass = create_entry(root, 240, 315, 'Password', width=70)
         self.user_pass.bind('<FocusIn>', lambda event: setText(self.user_pass, 'Password'))
         self.user_pass.bind('<FocusOut>', lambda event: restoreText(self.user_pass, 'Password'))
         self.user_pass.bind('<Return>',  lambda event: m.loginSubm(self.user_name.get(), self.user_pass.get()))
 
-        self.submit_button = create_button(root, 'Login', 320, 380, command= lambda: m.loginSubm(self.user_name.get(), self.user_pass.get()))
-        self.signin_button = create_button(root, 'Sign Up', 460, 380, command=switchL_S)
+        self.submit_button = create_button(root, 'Login', 295, 380, command= lambda: m.loginSubm(self.user_name.get(), self.user_pass.get()))
+        self.signin_button = create_button(root, 'Make a account', 450, 380, command=switchL_S)
 
 
 class AdminSignUp:

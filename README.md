@@ -11,7 +11,7 @@ Built to work on windows, should work on linux.
 
 ## Running this
 Install Python **3.7 or newer**, along with MySQL and `mysql-connector-python`
-Update `MYSQL_PASSWORD` variable in `functions.py` to your sql password
+Update `MYSQL_PASSWORD` variable in `functions.py` (in `__main__` for v3) to your sql password
 
 Clone the project
 ```bash

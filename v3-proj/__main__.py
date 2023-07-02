@@ -85,7 +85,7 @@ class BloodBankApp:
             6: blob
         }
     
-    def auth(self):
+    def authenticate(self):
         from authenticate import SelectAuthType
         SelectAuthType()
 
