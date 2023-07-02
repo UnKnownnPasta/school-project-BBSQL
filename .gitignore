@@ -5,3 +5,4 @@ versions/*
 /.vscode/
 DEV
 __pycache__
+*.zip

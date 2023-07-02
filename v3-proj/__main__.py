@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import messagebox, font, ttk
+from tkinter import messagebox
 import mysql.connector as sql
 import os, ctypes
 
@@ -8,10 +8,18 @@ import os, ctypes
 MYSQL_PASSWORD = 'root'
 current_dir = os.path.dirname(__file__)
 
+# -------------------------------------- Some Ease-Of-Use functions --------------------------------------
+
 def pathLoad(path):
     return os.path.join(current_dir, path)
 
+def installFont(file):
+    gdi32 = ctypes.WinDLL('gdi32')          # Install necessary font(s) to windows
+    gdi32.AddFontResourceW.argtypes = (ctypes.c_wchar_p,)
+    gdi32.AddFontResourceW(pathLoad(file))
 
+
+# ----------------------------------- Main Class that runs the program ------------------------------------
 
 class BloodBankApp:
 
@@ -23,12 +31,12 @@ class BloodBankApp:
         self.root.title('Blood Bank Mng')
         self.root.iconphoto(False, PhotoImage(file=pathLoad('src/logo-nosh.png')))
         self.root.resizable(False, False)
-        window_xCoord, window_yCoord = (self.root.winfo_screenwidth() - 940) // 2, (self.root.winfo_screenheight() - 500) // 2
+
+        window_xCoord = (self.root.winfo_screenwidth() - 940) // 2
+        window_yCoord = (self.root.winfo_screenheight() - 500) // 2
         self.root.geometry(f"{940}x{500}+{window_xCoord}+{window_yCoord}")
         
-        gdi32 = ctypes.WinDLL('gdi32')          # Install necessary font(s) to windows
-        gdi32.AddFontResourceW.argtypes = (ctypes.c_wchar_p,)
-        gdi32.AddFontResourceW(pathLoad('src/JosefinSans-Regular.ttf'))
+        installFont(file='src/JosefinSans-Regular.ttf')
 
         self.connection = None
         self.cursor = None
@@ -77,13 +85,16 @@ class BloodBankApp:
         logo_120 = PhotoImage(file=pathLoad('src/logo-120.png'))      # ImageTk.PhotoImage(logo_img.resize([int(0.25 * s) for s in logo_img.size]))
         profileImage = PhotoImage(file=pathLoad('src/profile.png'))
         bg_image_3 = PhotoImage(file=pathLoad('bg/bg-auth.png'))
+        lg = PhotoImage(file=pathLoad('src/lg.png'))
+        btn = PhotoImage(file=pathLoad('bg/button.png'))
 
         # Makes the images accessible globally -- called as globalImg[n], n being item index
         globalImages = {
             0: bg_image_1,    1: bg_image_2,
             2: logo_80,       3: logo_120,
             4: profileImage,  5: arrow,
-            6: blob,          7: bg_image_3
+            6: blob,          7: bg_image_3,
+            8: lg,            9: btn
         }
     
     def authenticate(self):

@@ -49,7 +49,7 @@ def create_button(control, text, varx, vary, **kwargs):
 
 # ---------------------------------- Handling submitting From Login/Signup ----------------------------------
 
-# for signup
+# for verifying info from signup screen (admin) and adding to database
 def AdminSubmit(postCode, contact, hospName, passwrd):
     verf = pinVerify(postCode)
 
@@ -79,7 +79,7 @@ def AdminSubmit(postCode, contact, hospName, passwrd):
         f.switchS_L()
 
 
-# for login
+# for verifying info from login screen (admin)
 def AdminAccess(un, pw):
     for i in [un, pw]:
         accessFilter = ['User Name', 'Password', ' ']

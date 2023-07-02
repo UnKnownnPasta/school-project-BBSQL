@@ -23,15 +23,29 @@ class SelectAuthType:
         self.auth_canvas.pack(side = "top", fill = "both", expand = True)
 
         self.count = 0
-        self.mainPage()
-    
-    def mainPage(self):
+
         standard_look = {"anchor": "nw", "fill":"#D22B2B"}
 
         self.auth_canvas.create_text(377, 85, text='Welcome!!', font=('Hello Sunday', 56), anchor=NW, fill='#303030')
         self.auth_canvas.create_text(380, 85, text='Welcome!!', font=('Hello Sunday', 55), **standard_look)
         self.auth_canvas.create_image(290, 70, image=globalImages[3], anchor='nw')
 
+        self.tempStartupButton = Button(root, text='Sign in as a User'.upper(), command= lambda: remove(self),
+            bd=0, activebackground='#D22B2B', bg='#EE4B2B', relief=FLAT, image=globalImages[9]
+        )
+        self.tempStartupButton.place(x=310, y=250)
+
+        self.switch_label = self.auth_canvas.create_text(340, 460, text='Or, Click to Login as Admin..', 
+            font=('Josefin Sans', 15), anchor=NW, fill='white'
+        )
+        self.auth_canvas.tag_bind(self.switch_label, '<Button-1>', self.LogOut)
+
+        def remove(self):
+            self.tempStartupButton.destroy()
+            self.mainPage()
+
+    
+    def mainPage(self):
         # Placeholder text for errors
         self.errorText = self.auth_canvas.create_text(250, 200, text='', font=('Josefin Sans', 16), fill='', anchor=NW)
 
@@ -52,7 +66,6 @@ class SelectAuthType:
 
     def validate(self, hn, un):
         for i in [hn, un]:
-            print('/' + i + '/')
             if len(i.strip()) == 0 or i in ['Hospital Name', 'Your Name']:
                 self.displayError()
                 return
@@ -60,13 +73,22 @@ class SelectAuthType:
                 self.displayError()
                 return
         
-        for name, widget in self.__dict__.items():
+        for widget in self.__dict__.values():
+
+            # isinstance(thing, type) checks if the "thing" is of the same data type as "type"
             if not isinstance(widget, int):
                 widget.destroy()
 
         # Proceed to admin login *for now*
         app.doLogin()
-        
+
+    def LogOut(self, x=None):
+        for widget in self.__dict__.values():
+            if not isinstance(widget, int):
+                widget.destroy()
+        app.doLogin()
+
+# ---------------------------------------------- Admin Pages ----------------------------------------------
 
 class AdminLogin:
     def __init__(self):
