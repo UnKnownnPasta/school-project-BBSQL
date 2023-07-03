@@ -10,6 +10,7 @@ def pinVerify(pin) -> True:
     return True
 
 
+
 # -------------------------------- Switch between Login and Signup (Admin) --------------------------------
 
 def switchS_L():
@@ -98,5 +99,7 @@ def AdminAccess(un, pw):
         return
 
     app.cursor.execute('select HospitalID, PinCode from Hospital where HospitalName=%s', (un,))
-    hId, pc = [i for i in app.cursor.fetchall()[0]]
-    # program(un, pw, hId, pc)
+    info_list = [un, pw] + [i for i in app.cursor.fetchall()[0]]
+
+    from adminpages import AdminApp
+    app.launchAdminApp(*info_list)
