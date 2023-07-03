@@ -6,7 +6,7 @@ from helper import *
 root, con, cur = app.root, app.connection, app.cursor
 
 
-# ----------------------------- Define text for the disappear-reappear effect -----------------------------
+# ------------------------ Define function for the text disappear-reappear effect -------------------------
 
 def setText(entry, defaultText):
     entry.delete(0, END) if entry.get().strip() == defaultText else None
@@ -16,6 +16,7 @@ def restoreText(entry, defaultText):
 
 
 # ------------------------------ Main Classes for welcome/login/signup pages ------------------------------
+
 class SelectAuthType:
     def __init__(self):
         self.auth_canvas = Canvas(root, width='940', height='500', highlightthickness=0)
@@ -30,15 +31,17 @@ class SelectAuthType:
         self.auth_canvas.create_text(380, 85, text='Welcome!!', font=('Hello Sunday', 55), **standard_look)
         self.auth_canvas.create_image(290, 70, image=globalImages[3], anchor='nw')
 
-        self.tempStartupButton = Button(root, text='Sign in as a User'.upper(), command= lambda: remove(self),
-            bd=0, activebackground='#D22B2B', bg='#EE4B2B', relief=FLAT, image=globalImages[9]
+        self.tempStartupButton = Button(root, command= lambda: remove(self),
+            bd=0, activebackground='#D22B2B', bg='#EE4B2B', relief=FLAT, image=globalImages[8]
         )
         self.tempStartupButton.place(x=310, y=250)
 
-        self.switch_label = self.auth_canvas.create_text(340, 460, text='Or, Click to Login as Admin..', 
-            font=('Josefin Sans', 15), anchor=NW, fill='white'
+        self.switch_label = Button(root, text='Or, Login as a Admin'.upper(),
+            padx=30, pady=0, relief=SOLID, activebackground='#D22B2B', bg='#D22B2B',
+            command=lambda: self.LogOut(), borderwidth=2, highlightcolor='black', fg='white',
+            font=('Calibri Light', 12), activeforeground='white', height=1
         )
-        self.auth_canvas.tag_bind(self.switch_label, '<Button-1>', self.LogOut)
+        self.switch_label.place(x=350, y=450)
 
         def remove(self):
             self.tempStartupButton.destroy()
@@ -57,7 +60,7 @@ class SelectAuthType:
         self.user_name.bind('<FocusIn>', lambda event: setText(self.user_name, 'Your Name'))
         self.user_name.bind('<FocusOut>', lambda event: restoreText(self.user_name, 'Your Name'))
 
-        submit = create_button(root, 'Login', 405, 360, command= lambda: self.validate(self.hospital_name.get(), self.user_name.get()))
+        self.submit = create_button(root, 'Login', 405, 360, command= lambda: self.validate(self.hospital_name.get(), self.user_name.get()))
 
     def displayError(self):
         self.count += 1
@@ -79,8 +82,7 @@ class SelectAuthType:
             if not isinstance(widget, int):
                 widget.destroy()
 
-        # Proceed to admin login *for now*
-        app.doLogin()
+        app.launchUserApp(un, hn)
 
     def LogOut(self, x=None):
         for widget in self.__dict__.values():
@@ -88,7 +90,9 @@ class SelectAuthType:
                 widget.destroy()
         app.doLogin()
 
-# ---------------------------------------------- Admin Pages ----------------------------------------------
+
+
+# -------------------------------------- Admin Login and Signup Pages -------------------------------------
 
 class AdminLogin:
     def __init__(self):
@@ -112,23 +116,30 @@ class AdminLogin:
         self.user_pass = create_entry(root, 240, 320, 'Password', width=70)
         self.user_pass.bind('<FocusIn>', lambda event: setText(self.user_pass, 'Password'))
         self.user_pass.bind('<FocusOut>', lambda event: restoreText(self.user_pass, 'Password'))
-        self.user_pass.bind('<Return>',  lambda event: m.loginSubm(self.user_name.get(), self.user_pass.get()))
+        self.user_pass.bind('<Return>',  lambda event: AdminAccess(self.user_name.get(), self.user_pass.get()))
 
-        self.submit_button = create_button(root, 'Login', 300, 380, command= lambda: m.loginSubm(self.user_name.get(), self.user_pass.get()))
+        self.switchBtn = Button(root, command= lambda: (self.destroy(), app.authenticate()), image=globalImages[5][1],
+            relief=FLAT, bd=0, highlightthickness=0, activebackground='#ad1e1e'
+        )
+        self.switchBtn.place(x=770, y=30)
+
+        self.submit_button = create_button(root, 'Login', 300, 380, command= lambda: AdminAccess(self.user_name.get(), self.user_pass.get()))
         self.signin_button = create_button(root, 'Make a account', 428, 380, command=switchL_S)
 
+    def destroy(self):
+        for i in list(self.__dict__.values()): i.destroy()
 
 class AdminSignUp:
     def __init__(self):
         self.signup_canvas  = Canvas(root, width='940', height='500', highlightthickness=0)
-        self.signup_canvas .create_image(0, 0, image=globalImages[0], anchor='nw')
-        self.signup_canvas .pack(side = "top", fill = "both", expand = True)
+        self.signup_canvas.create_image(0, 0, image=globalImages[0], anchor='nw')
+        self.signup_canvas.pack(side = "top", fill = "both", expand = True)
         self.mainPage()
 
     def mainPage(self):
-        titleText = self.signup_canvas .create_text(240, 180, text='Enter Details to Create A Account..', anchor=NW, font=('Josefin Sans', 17), fill='white')
-        altText = self.signup_canvas .create_text(320, 48, text='BLOOD BANK MANAGEMENT', anchor=NW, font=('Josefin Sans', 20, 'bold'), fill='white')
-        self.signup_canvas .create_image(230, 30, image=globalImages[3], anchor=NW)
+        titleText = self.signup_canvas.create_text(240, 180, text='Enter Details to Create A Account..', anchor=NW, font=('Josefin Sans', 17), fill='white')
+        altText = self.signup_canvas.create_text(320, 48, text='BLOOD BANK MANAGEMENT', anchor=NW, font=('Josefin Sans', 20, 'bold'), fill='white')
+        self.signup_canvas.create_image(230, 30, image=globalImages[3], anchor=NW)
 
         self.hospName = create_entry(root, 240, 250, 'Hospital Name', width=70)
         self.hospName.bind('<FocusIn>', lambda event: setText(self.hospName, 'Hospital Name'))
@@ -146,7 +157,7 @@ class AdminSignUp:
         self.PassWord.bind('<FocusIn>', lambda event: setText(self.PassWord, 'Enter a Strong Password'))
         self.PassWord.bind('<FocusOut>', lambda event: restoreText(self.PassWord, 'Enter a Strong Password'))
 
-        self.switchBtn = Button(root, command=switchS_L, image=globalImages[5], relief=FLAT, bd=0, highlightthickness=0, activebackground='#ad1e1e')
-        self.submitBtn = create_button(root, 'Submit', 390, 430, command= lambda: m.SignSubm(self.pinCode.get(), self.Contact.get(), self.hospName.get(), self.PassWord.get()))
+        self.switchBtn = Button(root, command=switchS_L, image=globalImages[5][0], relief=FLAT, bd=0, highlightthickness=0, activebackground='#ad1e1e')
+        self.submitBtn = create_button(root, 'Submit', 390, 430, command= lambda: AdminSubmit(self.pinCode.get(), self.Contact.get(), self.hospName.get(), self.PassWord.get()))
 
         self.switchBtn.place(x=770, y=30)

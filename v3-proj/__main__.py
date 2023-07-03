@@ -29,20 +29,23 @@ class BloodBankApp:
         self.root = Tk()
         self.root.title('Blood Bank System')
         self.root.title('Blood Bank Mng')
-        self.root.iconphoto(False, PhotoImage(file=pathLoad('src/logo-nosh.png')))
+        self.root.iconphoto(False, PhotoImage(file=pathLoad('src/logo-120.png')))
         self.root.resizable(False, False)
+        self.loading_label = Label(self.root, text='Loading...')
 
         window_xCoord = (self.root.winfo_screenwidth() - 940) // 2
         window_yCoord = (self.root.winfo_screenheight() - 500) // 2
         self.root.geometry(f"{940}x{500}+{window_xCoord}+{window_yCoord}")
         
         installFont(file='src/JosefinSans-Regular.ttf')
+        installFont(file='src/Hello Sunday.otf')
 
         self.connection = None
         self.cursor = None
 
-        self.login_var = None  # Stores login page widgets
-        self.signup_var = None # Stores signup page widgets
+        self.login_var = None     # Stores login page widgets
+        self.signup_var = None    # Stores signup page widgets
+        self.adduser_var = None   # Stores Add user page widgets
 
         self.initializeDatabase()
         self.initializeImages()
@@ -77,6 +80,7 @@ class BloodBankApp:
         # Defining a bunch of images to preload so that it loads instantly
         
         arrow = PhotoImage(file=pathLoad('src/arrow.png'))
+        arrow_unblur = PhotoImage(file=pathLoad('src/arrow_2.png'))
         blob = PhotoImage(file=pathLoad('src/box.png'))
         
         bg_image_1 = PhotoImage(file=pathLoad('bg/bg-blur-v2.png'))
@@ -85,19 +89,20 @@ class BloodBankApp:
         logo_120 = PhotoImage(file=pathLoad('src/logo-120.png'))      # ImageTk.PhotoImage(logo_img.resize([int(0.25 * s) for s in logo_img.size]))
         profileImage = PhotoImage(file=pathLoad('src/profile.png'))
         bg_image_3 = PhotoImage(file=pathLoad('bg/bg-auth.png'))
-        lg = PhotoImage(file=pathLoad('src/lg.png'))
         btn = PhotoImage(file=pathLoad('bg/button.png'))
+        logout = PhotoImage(file=pathLoad('src/lg.png'))
 
         # Makes the images accessible globally -- called as globalImg[n], n being item index
         globalImages = {
             0: bg_image_1,    1: bg_image_2,
             2: logo_80,       3: logo_120,
-            4: profileImage,  5: arrow,
+            4: profileImage,  5: [arrow, arrow_unblur],
             6: blob,          7: bg_image_3,
-            8: lg,            9: btn
+            8: btn,           9: logout
         }
     
     def authenticate(self):
+        self.loading_label.destroy()
         from authenticate import SelectAuthType
         SelectAuthType()
 
@@ -115,9 +120,14 @@ class BloodBankApp:
         # Initialize a variable with all login page widgets for future usage
         self.signup_var = list(signup.__dict__.values())
 
+    def launchUserApp(self, x, y):
+        from userpages import UserApp
+        ua = UserApp(x, y)
+
 if __name__ == "__main__":
     app = BloodBankApp()
 
     # Run login page
+    # app.launchUserApp('a', 'Lions EYE')
     app.authenticate()
     app.root.mainloop()

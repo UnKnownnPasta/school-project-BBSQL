@@ -32,17 +32,18 @@ Admin/User independent pages
     - Detailed view of profile
 
 # 🖼 Gallery
-### Login screen:
-![Login Screen](blob/ss-1.png)
+### Greeting:
+![Login Screen](blob/ss-5.png)
 
 ### Sign up screen:
 ![Sign up Screen](blob/ss-2.png)
+![Login Screen](blob/ss-1.png)
 
-### Admin Landing Page: [^2]
-![Main](blob/ss-3.png)
+### User Panel: [^2]
+![Main](blob/ss-4.png)
 
-### Editing Profile:
-![Profile](blob/ss-4.png)
+### Main Admin Page: [^2]
+![Profile](blob/ss-3.png)
 
 
 

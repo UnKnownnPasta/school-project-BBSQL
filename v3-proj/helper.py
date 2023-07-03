@@ -7,7 +7,7 @@ def pinVerify(pin) -> True:
     invalid = [29, 35, 54, 55, 65, 66]
     if pin[:2] in invalid:
         return False
-    return status
+    return True
 
 
 # -------------------------------- Switch between Login and Signup (Admin) --------------------------------
@@ -65,18 +65,17 @@ def AdminSubmit(postCode, contact, hospName, passwrd):
         messagebox.showerror('Failed', 'No Valid Contacts provided.')
         return
         
-    passwrd = passwrd.replace(' ', '_')
     try:
-        vals = (hospName, passwrd, contact, postCode)
+        vals = (hospName.replace(' ', '_'), passwrd.replace(' ', '_'), contact, postCode)
         query = "insert into Hospital (HospitalName, Password, Contact, PinCode) values (%s, %s, %s, %s)"
 
-        f.cur.execute(query, vals)
-        f.con.commit()
+        app.cursor.execute(query, vals)
+        app.connection.commit()
     except:
         messagebox.showerror('Error', 'Failed to signup. Try again.')
     else:
         messagebox.showinfo('Success', 'Account created successfully! Login to it here')
-        f.switchS_L()
+        switchS_L()
 
 
 # for verifying info from login screen (admin)
@@ -89,15 +88,15 @@ def AdminAccess(un, pw):
             return
 
     query = "select * from hospital where HospitalName=%s and Password=%s"
-    values = (un, pw.replace(' ', '_'))
+    values = (un.replace(' ', '_'), pw.replace(' ', '_'))
 
-    f.cur.execute(query, values)
-    res = f.cur.fetchone()
+    app.cursor.execute(query, values)
+    res = app.cursor.fetchone()
 
     if res == None:
         messagebox.showerror('Error', 'Login details are not correct.')
         return
 
-    f.cur.execute('select HospitalID, PinCode from Hospital where HospitalName=%s', (un,))
-    hId, pc = [i for i in f.cur.fetchall()[0]]
-    program(un, pw, hId, pc)
+    app.cursor.execute('select HospitalID, PinCode from Hospital where HospitalName=%s', (un,))
+    hId, pc = [i for i in app.cursor.fetchall()[0]]
+    # program(un, pw, hId, pc)
